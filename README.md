@@ -1,5 +1,9 @@
 # phlib/console
 
+[![Build Status](https://img.shields.io/travis/phlib/console/master.svg)](https://travis-ci.org/phlib/console)
+[![Latest Stable Version](https://img.shields.io/packagist/v/phlib/console.svg)](https://packagist.org/packages/phlib/console)
+[![Total Downloads](https://img.shields.io/packagist/dt/phlib/console.svg)](https://packagist.org/packages/phlib/console)
+
 Console implementation.
 
 ## Install
