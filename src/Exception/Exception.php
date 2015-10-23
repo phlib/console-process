@@ -1,6 +1,6 @@
 <?php
 
-namespace Phlib\JobQueue\Exception;
+namespace Phlib\Console\Exception;
 
 interface Exception
 {
