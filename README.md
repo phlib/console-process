@@ -20,7 +20,8 @@ or
 }
 ```
 
-## Basic Usage
+## Daemon Command
+### Basic Usage
 
 ```php
 <?php
@@ -53,4 +54,57 @@ class MyProcessCommand extends DaemonCommand
 
 ```bash
 # path/to/my/process /path/to/my.pid stop
+```
+
+## Configuration Helper
+
+Adds the ```-c path/to/config.php``` parameter to the console application and makes it easily accessible to all 
+commands. This is most useful for third party libraries which rely on the configuration being specified from the 
+options.
+
+### Basic Usage
+
+```php
+// your usual cli setup script
+
+use Phlib\Console\Helper\ConfigurationHelper;
+
+$app = new Application('my-cli');
+$app->setCommands(['...']);
+ConfigurationHelper::initHelper($app, []);
+$app->run();
+
+```
+
+```php
+class MyCommand extends Command
+{
+    '...'
+
+    public function createMyObjectInstance()
+    {
+        $config = $this->getHelper('configuration')->fetch();
+        if ($config === false) {
+            $config = ['my' => 'defaults'];
+        }
+        return new MyObjectInstance($config);
+    }
+}
+```
+
+### Configuration
+You can specify some options to setup the helper through the ```initHelper``` static method.
+
+|Name|Type|Default|Description|
+|----|----|-------|-----------|
+|`name`|*String*|`'config'`|The name of the option on the command line.|
+|`abbreviation`|*String*|`'c'`|The abbreviation of the option on the command line.|
+|`description`|*String*|`'Path to the configuration file.'`|The associated description for the option.|
+|`filename`|*String*|`'config.php'`|The filename that will be detected if no name is specified.|
+
+```php
+ConfigurationHelper::initHelper($app, [
+    'name' => 'config-option',
+    'filename' => 'my-cli-config.php',
+]);
 ```
