@@ -99,8 +99,8 @@ You can specify some options to setup the helper through the ```initHelper``` st
 |----|----|-------|-----------|
 |`name`|*String*|`'config'`|The name of the option on the command line.|
 |`abbreviation`|*String*|`'c'`|The abbreviation of the option on the command line.|
-|`description`|*String*|`'Path to the configuration file.'`|The associated description for the option.|
-|`filename`|*String*|`'config.php'`|The filename that will be detected if no name is specified.|
+|`description`|*String*|`'...'`|The associated description for the option.|
+|`filename`|*String*|`'cli-config.php'`|The filename that will be detected if no name is specified.|
 
 ```php
 ConfigurationHelper::initHelper($app, [

@@ -44,7 +44,7 @@ class ConfigurationHelper extends AbstractHelper implements InputAwareInterface
             'name'         => 'config',
             'abbreviation' => 'c',
             'description'  => 'Path to the configuration file.',
-            'filename'     => 'config.php'
+            'filename'     => 'cli-config.php'
         ];
         $options = $options + $defaults;
 
