@@ -64,7 +64,7 @@ class ConfigurationHelper extends AbstractHelper implements InputAwareInterface
      * @param string $name
      * @param string $filename
      */
-    public function __construct($name = 'config', $filename = 'config.php')
+    public function __construct($name = 'config', $filename = 'cli-config.php')
     {
         $this->name = $name;
         $this->filename = $filename;
@@ -125,7 +125,7 @@ class ConfigurationHelper extends AbstractHelper implements InputAwareInterface
         if ($filePath === false || !is_file($filePath) || !is_readable($filePath)) {
             return false;
         }
-        return include_once $filePath;
+        return include $filePath;
     }
 
     /**
@@ -143,7 +143,7 @@ class ConfigurationHelper extends AbstractHelper implements InputAwareInterface
             throw new \InvalidArgumentException("Specified configuration '$filePath' is not accessible.");
         }
 
-        return include_once $filePath;
+        return include $filePath;
     }
 
     /**
