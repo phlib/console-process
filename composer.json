@@ -1,5 +1,5 @@
 {
-    "name": "phlib/jobqueue",
+    "name": "phlib/console",
     "type": "library",
     "description": "Console implementation.",
     "keywords": ["symfony", "console", "daemon", "background"],
