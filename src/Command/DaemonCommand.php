@@ -37,14 +37,18 @@ abstract class DaemonCommand extends Command
     {
         parent::__construct($name);
 
-        // add default arguments
-        $this->addArgument('pid-file', InputArgument::REQUIRED, 'PID file location.')
-            ->addArgument('action', InputArgument::REQUIRED, 'Start or stop the process.')
-            ->addOption('daemonize', 'd', null, 'Make the process a background process (fork).');
+        $this->setupDefaultConfigure();
 
         // add stop signals
         $this->addSignalCallback(SIGTERM, [$this, 'shutdown']);
         $this->addSignalCallback(SIGINT, [$this, 'shutdown']);
+    }
+
+    protected function setupDefaultConfigure()
+    {
+        $this->addArgument('pid-file', InputArgument::REQUIRED, 'PID file location.')
+            ->addArgument('action', InputArgument::REQUIRED, 'Start or stop the process.')
+            ->addOption('daemonize', 'd', null, 'Make the process a background process (fork).');
     }
 
     /**
@@ -91,14 +95,20 @@ abstract class DaemonCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $action = strtolower($input->getArgument('action'));
-        if (!in_array($action, ['start', 'stop'])) {
+        if (!in_array($action, ['start', 'stop', 'status'])) {
             throw new \InvalidArgumentException("Provided action is invalid, expecting 'start' or 'stop'.");
         }
 
-        if ($action == 'start') {
-            $this->start($input, $output);
-        } else {
-            $this->stop($input, $output);
+        switch ($action) {
+            case 'start':
+                $this->start($input, $output);
+                break;
+            case 'stop':
+                $this->stop($input, $output);
+                break;
+            case 'status':
+                $this->status($input, $output);
+                break;
         }
     }
 
@@ -155,6 +165,9 @@ abstract class DaemonCommand extends Command
      */
     private function daemonize()
     {
+        // prevent permission issues
+        umask(0);
+
         $pid = pcntl_fork();
         if ($pid == -1) {
             /* fork failed */
@@ -181,19 +194,43 @@ abstract class DaemonCommand extends Command
         $pidFile = $input->getArgument('pid-file');
 
         // pid file check
-        $fh = @fopen($pidFile, 'r');
-        if (!file_exists($pidFile) || !$fh) {
+        $fileHandle = @fopen($pidFile, 'r');
+        if (!file_exists($pidFile) || !$fileHandle) {
             throw new \RuntimeException(sprintf("PID file doesn't exist '%s'", $pidFile));
         }
 
-        $pid = (int)fgets($fh);
-        fclose($fh);
+        $pid = (int)fgets($fileHandle);
+        fclose($fileHandle);
 
         if ($pid > 0) {
             do {
                 posix_kill($pid, SIGTERM);
                 usleep(500000);
             } while(posix_kill($pid, 0));
+        }
+    }
+
+    private function status(InputInterface $input, OutputInterface $output)
+    {
+        $pidFile = $input->getArgument('pid-file');
+        if (!file_exists($pidFile)) {
+            $output->writeln("Not running");
+            return;
+        }
+
+        $fileHandle = @fopen($pidFile, 'r');
+        if (!$fileHandle) {
+            $output->writeln("PID file exists but is not readable.");
+        }
+
+        $pid = (int)fgets($fileHandle);
+        fclose($fileHandle);
+
+        $running = posix_kill($pid, 0);
+        if ($running) {
+            $output->writeln("Running");
+        } else {
+            $output->writeln("Not running");
         }
     }
 
