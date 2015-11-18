@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class BackgroundCommandAbstract
  * @package Phlib\Console\Command
  */
-abstract class BackgroundCommandAbstract extends Command
+class BackgroundCommand extends Command
 {
     /**
      * @var bool

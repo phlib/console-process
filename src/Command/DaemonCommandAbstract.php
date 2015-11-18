@@ -4,6 +4,7 @@ namespace Phlib\Console\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class DaemonCommand
  * @package Phlib\Console\Console
  */
-abstract class DaemonCommandAbstract extends BackgroundCommandAbstract
+class DaemonCommand extends BackgroundCommand
 {
     /**
      * @inheritdoc
@@ -20,13 +21,14 @@ abstract class DaemonCommandAbstract extends BackgroundCommandAbstract
     public function __construct($name = null)
     {
         parent::__construct($name);
-        $this->configureDeamon();
+        $this->configureDaemon();
     }
 
-    protected function configureDeamon()
+    protected function configureDaemon()
     {
         $this->addArgument('pid-file', InputArgument::REQUIRED, 'PID file location.')
-            ->addArgument('action', InputArgument::REQUIRED, 'Start or stop the process.');
+            ->addArgument('action', InputArgument::REQUIRED, 'Start or stop the process.')
+            ->addOption('no-daemonize', 'd', InputOption::VALUE_NONE, 'Do not daemonize the process.');
     }
 
     /**
@@ -69,6 +71,9 @@ abstract class DaemonCommandAbstract extends BackgroundCommandAbstract
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     private function start(InputInterface $input, OutputInterface $output)
     {
@@ -78,27 +83,33 @@ abstract class DaemonCommandAbstract extends BackgroundCommandAbstract
             throw new \InvalidArgumentException(sprintf("Can not write to PID file '%s'", $pidFile));
         }
 
-        $this->onBeforeDaemonize($input, $output);
-        $isChild = $this->daemonize();
-        if (!$isChild) {
-            $this->onAfterDaemonizeParent($input, $output);
-            return;
-        }
+        if (!$input->getOption('no-daemonize')) {
+            $this->onBeforeDaemonize($input, $output);
+            $isChild = $this->daemonize();
+            if (!$isChild) {
+                $this->onAfterDaemonizeParent($input, $output);
+                return;
+            }
 
-        // child shouldn't hold onto parents input/output
-        $input  = clone $input;
-        $output = $this->createChildOutput();
-        $this->onAfterDaemonizeChild($input, $output);
+            // child shouldn't hold onto parents input/output
+            $input = clone $input;
+            $output = $this->createChildOutput();
+            $this->onAfterDaemonizeChild($input, $output);
+        }
 
         $written = file_put_contents($pidFile, getmypid());
         if (!$written) {
             throw new \RuntimeException(sprintf("Failed to write PID file '%s'", $pidFile));
         }
 
-        parent::background($input, $output);
+        try {
+            parent::background($input, $output);
+        } catch (\Exception $e) {
+            unlink($pidFile);
+            throw $e;
+        }
 
         unlink($pidFile);
-        $this->onShutdown($input, $output);
     }
 
     /**
@@ -154,6 +165,10 @@ abstract class DaemonCommandAbstract extends BackgroundCommandAbstract
         }
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
     private function status(InputInterface $input, OutputInterface $output)
     {
         $pidFile = $input->getArgument('pid-file');

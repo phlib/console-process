@@ -10,13 +10,14 @@ class TestCommand extends DaemonCommand
     protected $shutdownValue = null;
     protected $outputCallback;
 
-    protected function doExecute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (!is_null($this->executeValue)) {
             $output->writeln($this->executeValue);
         }
         $this->shutdown();
     }
+
     protected function onShutdown(InputInterface $input, OutputInterface $output)
     {
         if (!is_null($this->shutdownValue)) {

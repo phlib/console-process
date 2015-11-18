@@ -79,7 +79,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testDaemonOptionIsAdded()
     {
-        $this->assertTrue($this->command->getDefinition()->hasOption('daemonize'));
+        $this->assertTrue($this->command->getDefinition()->hasOption('no-daemonize'));
     }
 
     public function testDefaultSignalCallbacksAreCreated()
@@ -93,7 +93,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->tester->execute([
             'pid-file' => '/path/to/my.pid',
             'action' => 'start',
-            '-d' => true
+            '-d' => false
         ]);
     }
 
@@ -110,7 +110,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->tester->execute([
             'pid-file' => '/path/to/my.pid',
             'action' => 'start',
-            '-d' => true
+            '-d' => false
         ]);
     }
 
@@ -127,7 +127,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->tester->execute([
             'pid-file' => '/path/to/my.pid',
             'action' => 'start',
-            '-d' => true
+            '-d' => false
         ]);
     }
 
@@ -143,7 +143,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->tester->execute([
             'pid-file' => '/path/to/my.pid',
             'action' => 'start',
-            '-d' => true
+            '-d' => false
         ]);
         $this->assertEquals("$expected\n", $this->tester->getDisplay());
     }
@@ -160,7 +160,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->tester->execute([
             'pid-file' => '/path/to/my.pid',
             'action' => 'start',
-            '-d' => true
+            '-d' => false
         ]);
         $this->assertEquals("$expected\n", $this->tester->getDisplay());
     }
