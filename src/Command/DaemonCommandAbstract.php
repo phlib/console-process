@@ -2,7 +2,6 @@
 
 namespace Phlib\Console\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -13,42 +12,21 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class DaemonCommand
  * @package Phlib\Console\Console
  */
-abstract class DaemonCommand extends Command
+abstract class DaemonCommandAbstract extends BackgroundCommandAbstract
 {
-    /**
-     * @var bool
-     */
-    private $continue = true;
-
-    /**
-     * @var array
-     */
-    private $signalCallbacks = [];
-
-    /**
-     * @var int
-     */
-    protected $processingDelay = 1; //second
-
     /**
      * @inheritdoc
      */
     public function __construct($name = null)
     {
         parent::__construct($name);
-
-        $this->setupDefaultConfigure();
-
-        // add stop signals
-        $this->addSignalCallback(SIGTERM, [$this, 'shutdown']);
-        $this->addSignalCallback(SIGINT, [$this, 'shutdown']);
+        $this->configureDeamon();
     }
 
-    protected function setupDefaultConfigure()
+    protected function configureDeamon()
     {
         $this->addArgument('pid-file', InputArgument::REQUIRED, 'PID file location.')
-            ->addArgument('action', InputArgument::REQUIRED, 'Start or stop the process.')
-            ->addOption('daemonize', 'd', null, 'Make the process a background process (fork).');
+            ->addArgument('action', InputArgument::REQUIRED, 'Start or stop the process.');
     }
 
     /**
@@ -76,40 +54,16 @@ abstract class DaemonCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
-    abstract protected function doExecute(InputInterface $input, OutputInterface $output);
-
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
-    protected function onShutdown(InputInterface $input, OutputInterface $output)
-    {
-    }
-
-    /**
      * {@inheritDoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function background(InputInterface $input, OutputInterface $output)
     {
         $action = strtolower($input->getArgument('action'));
         if (!in_array($action, ['start', 'stop', 'status'])) {
-            throw new \InvalidArgumentException("Provided action is invalid, expecting 'start' or 'stop'.");
+            throw new \InvalidArgumentException("Provided action is invalid, expecting 'start', 'stop' or 'status'.");
         }
 
-        switch ($action) {
-            case 'start':
-                $this->start($input, $output);
-                break;
-            case 'stop':
-                $this->stop($input, $output);
-                break;
-            case 'status':
-                $this->status($input, $output);
-                break;
-        }
+        return $this->$action($input, $output);
     }
 
     /**
@@ -124,34 +78,24 @@ abstract class DaemonCommand extends Command
             throw new \InvalidArgumentException(sprintf("Can not write to PID file '%s'", $pidFile));
         }
 
-        $this->registerSignals($input, $output);
-
-        if ($input->getOption('daemonize')) {
-            $this->onBeforeDaemonize($input, $output);
-            $isChild = $this->daemonize();
-            if (!$isChild) {
-                $this->onAfterDaemonizeParent($input, $output);
-                return;
-            }
-
-            // child shouldn't hold onto parents input/output
-            $input  = clone $input;
-            $output = $this->createChildOutput();
-            $this->onAfterDaemonizeChild($input, $output);
+        $this->onBeforeDaemonize($input, $output);
+        $isChild = $this->daemonize();
+        if (!$isChild) {
+            $this->onAfterDaemonizeParent($input, $output);
+            return;
         }
+
+        // child shouldn't hold onto parents input/output
+        $input  = clone $input;
+        $output = $this->createChildOutput();
+        $this->onAfterDaemonizeChild($input, $output);
 
         $written = file_put_contents($pidFile, getmypid());
         if (!$written) {
             throw new \RuntimeException(sprintf("Failed to write PID file '%s'", $pidFile));
         }
 
-        do {
-            $this->doExecute($input, $output);
-
-            $this->sleep();
-            pcntl_signal_dispatch();
-        } while ($this->continue);
-
+        parent::background($input, $output);
 
         unlink($pidFile);
         $this->onShutdown($input, $output);
@@ -231,42 +175,6 @@ abstract class DaemonCommand extends Command
             $output->writeln("Running");
         } else {
             $output->writeln("Not running");
-        }
-    }
-
-    /**
-     * Tell the process to stop running at the next iteration.
-     */
-    protected function shutdown()
-    {
-        $this->continue = false;
-    }
-
-    /**
-     * Causes the process to sleep to stop hammering any resources.
-     */
-    protected function sleep()
-    {
-        sleep($this->processingDelay);
-    }
-
-    /**
-     * @param int $signal
-     * @param callable $callback
-     * @return $this
-     */
-    protected function addSignalCallback($signal, callable $callback)
-    {
-        $this->signalCallbacks[$signal][] = $callback;
-        return $this;
-    }
-
-    private function registerSignals()
-    {
-        foreach ($this->signalCallbacks as $signal => $callbacks) {
-            foreach ($callbacks as $callback) {
-                pcntl_signal($signal, $callback);
-            }
         }
     }
 
