@@ -4,7 +4,11 @@
 [![Latest Stable Version](https://img.shields.io/packagist/v/phlib/console.svg)](https://packagist.org/packages/phlib/console)
 [![Total Downloads](https://img.shields.io/packagist/dt/phlib/console.svg)](https://packagist.org/packages/phlib/console)
 
-Console implementation.
+Console signal implementation using [PHPs Process control functions](http://php.net/manual/en/book.pcntl.php).
+
+There are 2 implementations.
+1. Background command. Allows a process to be interrupted using the signal handler.
+2. Daemon command. Builds on the Background command to allow forking the process.
 
 ## Install
 
@@ -13,15 +17,42 @@ Via Composer
 ``` bash
 $ composer require phlib/console
 ```
-or
-``` JSON
-"require": {
-    "phlib/console": "*"
+
+## Background Command
+### Basic Usage
+
+The Background Command works in the same way as you're used to with the normal Symfony Command.
+
+```php
+<?php
+
+use Phlib\Console\Command\BackgroundCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+class MyProcessCommand extends BackgroundCommand
+{
+    protected function configure()
+    {
+        $this->setName('my:process')
+            ->setDescription('My background process.');
+            
+        $this->processingDelay = 3;
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('Doing important work!');
+    }
 }
+
 ```
 
 ## Daemon Command
 ### Basic Usage
+
+Apart from extending a different class, the Daemon Command looks and works in the same way as the Background
+Command.
 
 ```php
 <?php
@@ -40,7 +71,7 @@ class MyProcessCommand extends DaemonCommand
         $this->processingDelay = 3;
     }
 
-    protected function doExecute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('Doing important work!');
     }
@@ -54,57 +85,4 @@ class MyProcessCommand extends DaemonCommand
 
 ```bash
 # path/to/my/process /path/to/my.pid stop
-```
-
-## Configuration Helper
-
-Adds the ```-c path/to/config.php``` parameter to the console application and makes it easily accessible to all 
-commands. This is most useful for third party libraries which rely on the configuration being specified from the 
-options.
-
-### Basic Usage
-
-```php
-// your usual cli setup script
-
-use Phlib\Console\Helper\ConfigurationHelper;
-
-$app = new Application('my-cli');
-$app->setCommands(['...']);
-ConfigurationHelper::initHelper($app, []);
-$app->run();
-
-```
-
-```php
-class MyCommand extends Command
-{
-    '...'
-
-    public function createMyObjectInstance()
-    {
-        $config = $this->getHelper('configuration')->fetch();
-        if ($config === false) {
-            $config = ['my' => 'defaults'];
-        }
-        return new MyObjectInstance($config);
-    }
-}
-```
-
-### Configuration
-You can specify some options to setup the helper through the ```initHelper``` static method.
-
-|Name|Type|Default|Description|
-|----|----|-------|-----------|
-|`name`|*String*|`'config'`|The name of the option on the command line.|
-|`abbreviation`|*String*|`'c'`|The abbreviation of the option on the command line.|
-|`description`|*String*|`'...'`|The associated description for the option.|
-|`filename`|*String*|`'cli-config.php'`|The filename that will be detected if no name is specified.|
-
-```php
-ConfigurationHelper::initHelper($app, [
-    'name' => 'config-option',
-    'filename' => 'my-cli-config.php',
-]);
 ```
