@@ -26,8 +26,8 @@ class DaemonCommand extends BackgroundCommand
 
     protected function configureDaemon()
     {
-        $this->addArgument('pid-file', InputArgument::REQUIRED, 'PID file location.')
-            ->addArgument('action', InputArgument::REQUIRED, 'Start or stop the process.')
+        $this->addArgument('action', InputArgument::REQUIRED, 'Start, stop or status.')
+            ->addOption('pid-file', 'p', InputOption::VALUE_REQUIRED, 'PID file location.', false)
             ->addOption('no-daemonize', 'd', InputOption::VALUE_NONE, 'Do not daemonize the process.');
     }
 
@@ -78,7 +78,7 @@ class DaemonCommand extends BackgroundCommand
     private function start(InputInterface $input, OutputInterface $output)
     {
         // pid file check
-        $pidFile = $input->getArgument('pid-file');
+        $pidFile = $this->getPidFilename($input);
         if (file_exists($pidFile) || !is_writable(dirname($pidFile))) {
             throw new \InvalidArgumentException(sprintf("Can not write to PID file '%s'", $pidFile));
         }
@@ -146,7 +146,7 @@ class DaemonCommand extends BackgroundCommand
      */
     private function stop(InputInterface $input, OutputInterface $output)
     {
-        $pidFile = $input->getArgument('pid-file');
+        $pidFile = $this->getPidFilename($input);
 
         // pid file check
         $fileHandle = @fopen($pidFile, 'r');
@@ -171,7 +171,7 @@ class DaemonCommand extends BackgroundCommand
      */
     private function status(InputInterface $input, OutputInterface $output)
     {
-        $pidFile = $input->getArgument('pid-file');
+        $pidFile = $this->getPidFilename($input);
         if (!file_exists($pidFile)) {
             $output->writeln("Not running");
             return;
@@ -199,5 +199,22 @@ class DaemonCommand extends BackgroundCommand
     protected function createChildOutput()
     {
         return new NullOutput();
+    }
+
+    /**
+     * @param InputInterface $input
+     * @return string
+     */
+    protected function getPidFilename(InputInterface $input)
+    {
+        // pid file check
+        $pidFile = $input->getOption('pid-file');
+        if ($pidFile === false) {
+            // no file specified, generate our own name
+            $name = str_replace([' '], ['-'], $this->getName());
+            $pidFile = __DIR__ . $name . '.pid';
+        }
+
+        return $pidFile;
     }
 }

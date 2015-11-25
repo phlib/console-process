@@ -72,9 +72,9 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phlib\ConsoleProcess\Command\BackgroundCommand', $this->command);
     }
 
-    public function testPidFileArgumentIsAdded()
+    public function testPidFileOptionIsAdded()
     {
-        $this->assertTrue($this->command->getDefinition()->hasArgument('pid-file'));
+        $this->assertTrue($this->command->getDefinition()->hasOption('pid-file'));
     }
 
     public function testActionArgumentIsAdded()
@@ -98,9 +98,9 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $this->tester->execute([
-            'pid-file' => '/path/to/my.pid',
             'action' => 'start',
-            '-d' => false
+            '-p'     => '/path/to/my.pid',
+            '-d'     => false
         ]);
     }
 
@@ -115,9 +115,9 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $this->tester->execute([
-            'pid-file' => '/path/to/my.pid',
             'action' => 'start',
-            '-d' => false
+            '-p'     => '/path/to/my.pid',
+            '-d'     => false
         ]);
     }
 
@@ -131,9 +131,9 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $this->tester->execute([
-            'pid-file' => '/path/to/my.pid',
             'action' => 'start',
-            '-d' => false
+            '-p'     => '/path/to/my.pid',
+            '-d'     => false
         ]);
         $this->assertEquals("$expected\n", $this->tester->getDisplay());
     }
@@ -148,9 +148,9 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $this->tester->execute([
-            'pid-file' => '/path/to/my.pid',
             'action' => 'start',
-            '-d' => false
+            '-p'     => '/path/to/my.pid',
+            '-d'     => false
         ]);
         $this->assertEquals("$expected\n", $this->tester->getDisplay());
     }
@@ -164,8 +164,8 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $posix_kill->expects($this->atLeast(2))->with($this->equalTo($expected))->willReturn(false);
 
         $this->tester->execute([
-            'pid-file' => '/path/to/my.pid',
-            'action' => 'stop'
+            'action' => 'stop',
+            '-p'     => '/path/to/my.pid'
         ]);
     }
 
