@@ -32,7 +32,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        require_once __DIR__ . '/files/TestCommand.php';
+        require_once __DIR__ . '/files/DaemonCommandStub.php';
     }
 
     public function setUp()
@@ -40,7 +40,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->application = new Application();
-        $this->application->add(new \TestCommand($this->commandName));
+        $this->application->add(new \DaemonCommandStub($this->commandName));
 
         $this->command = $this->application->find($this->commandName);
         $this->tester = new CommandTester($this->command);
@@ -67,6 +67,11 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->commandName, $this->command->getName());
     }
 
+    public function testInstanceOfBackgroundCommand()
+    {
+        $this->assertInstanceOf('\Phlib\Console\Command\BackgroundCommand', $this->command);
+    }
+
     public function testPidFileArgumentIsAdded()
     {
         $this->assertTrue($this->command->getDefinition()->hasArgument('pid-file'));
@@ -80,21 +85,6 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
     public function testDaemonOptionIsAdded()
     {
         $this->assertTrue($this->command->getDefinition()->hasOption('no-daemonize'));
-    }
-
-    public function testDefaultSignalCallbacksAreCreated()
-    {
-        $this->setupStartFunctions(123);
-
-        $pcntl_signal = $this->getFunctionMock('\Phlib\Console\Command', 'pcntl_signal');
-        $pcntl_signal->expects($this->exactly(2))
-            ->withConsecutive($this->onConsecutiveCalls(SIGTERM, SIGINT));
-
-        $this->tester->execute([
-            'pid-file' => '/path/to/my.pid',
-            'action' => 'start',
-            '-d' => false
-        ]);
     }
 
     /**
@@ -133,7 +123,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testChildExecutesSuccessfully()
     {
-        $expected = 'doExecute called';
+        $expected = 'execute called';
         $this->command->setExecuteOutput($expected);
         $this->setupStartFunctions(null);
         $pcntl_signal = $this->getFunctionMock('\Phlib\Console\Command', 'pcntl_signal');
