@@ -7,6 +7,7 @@
 Console signal implementation using [PHPs Process control functions](http://php.net/manual/en/book.pcntl.php).
 
 There are 2 implementations.
+
 1. Background command. Allows a process to be interrupted using the signal handler.
 2. Daemon command. Builds on the Background command to allow forking the process.
 
