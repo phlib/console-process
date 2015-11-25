@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class BackgroundCommandAbstract
+ * Class BackgroundCommand
  * @package Phlib\Console\Command
  */
 class BackgroundCommand extends Command
@@ -25,7 +25,7 @@ class BackgroundCommand extends Command
     /**
      * @var int
      */
-    protected $processingDelay = 5000;
+    protected $processingDelay = 500000;
 
     /**
      * @var callable
@@ -53,7 +53,7 @@ class BackgroundCommand extends Command
     public function setCode($code)
     {
         if (!is_callable($code)) {
-            throw new \InvalidArgumentException('Invalid callable provided to Command::setCode.');
+            throw new \InvalidArgumentException('Invalid callable provided to BackgroundCommand::setCode.');
         }
 
         $this->backgroundExecute = $code;
@@ -94,7 +94,7 @@ class BackgroundCommand extends Command
     }
 
     /**
-     * Causes the process to sleep to stop hammering any resources.
+     * Causes the process to sleep for the number of microseconds as specifed by processing delay property.
      */
     protected function sleep()
     {
@@ -108,7 +108,7 @@ class BackgroundCommand extends Command
      */
     protected function addSignalCallback($signal, callable $callback)
     {
-        if (array_key_exists($signal, $this->signalCallbacks)) {
+        if (!array_key_exists($signal, $this->signalCallbacks)) {
             $this->signalCallbacks[$signal] = [];
         }
         $this->signalCallbacks[$signal][] = $callback;
@@ -116,7 +116,7 @@ class BackgroundCommand extends Command
     }
 
     /**
-     *
+     * Register each of the added signals for each of the callbacks.
      */
     private function registerSignals()
     {
