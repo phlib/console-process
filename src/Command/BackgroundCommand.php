@@ -1,6 +1,6 @@
 <?php
 
-namespace Phlib\Console\Command;
+namespace Phlib\ConsoleProcess\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class BackgroundCommand
- * @package Phlib\Console\Command
+ * @package Phlib\ConsoleProcess\Command
  */
 class BackgroundCommand extends Command
 {

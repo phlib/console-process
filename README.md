@@ -1,8 +1,8 @@
-# phlib/console
+# phlib/console-process
 
-[![Build Status](https://img.shields.io/travis/phlib/console/master.svg)](https://travis-ci.org/phlib/console)
-[![Latest Stable Version](https://img.shields.io/packagist/v/phlib/console.svg)](https://packagist.org/packages/phlib/console)
-[![Total Downloads](https://img.shields.io/packagist/dt/phlib/console.svg)](https://packagist.org/packages/phlib/console)
+[![Build Status](https://img.shields.io/travis/phlib/console-process/master.svg)](https://travis-ci.org/phlib/console-process)
+[![Latest Stable Version](https://img.shields.io/packagist/v/phlib/console-process.svg)](https://packagist.org/packages/phlib/console-process)
+[![Total Downloads](https://img.shields.io/packagist/dt/phlib/console-process.svg)](https://packagist.org/packages/phlib/console-process)
 
 Console signal implementation using [PHPs Process control functions](http://php.net/manual/en/book.pcntl.php).
 
@@ -15,7 +15,7 @@ There are 2 implementations.
 Via Composer
 
 ``` bash
-$ composer require phlib/console
+$ composer require phlib/console-process
 ```
 
 ## Background Command

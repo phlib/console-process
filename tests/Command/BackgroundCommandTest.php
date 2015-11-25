@@ -1,6 +1,6 @@
 <?php
 
-namespace Phlib\Console\Tests\Command;
+namespace Phlib\ConsoleProcess\Tests\Command;
 
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Application;
@@ -66,7 +66,7 @@ class BackgroundCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultSignalCallbacksAreCreated()
     {
-        $pcntl_signal = $this->getFunctionMock('\Phlib\Console\Command', 'pcntl_signal');
+        $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
         $pcntl_signal->expects($this->exactly(2))
             ->withConsecutive($this->onConsecutiveCalls(SIGTERM, SIGINT));
 

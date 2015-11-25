@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/ExecuteStubTrait.php';
 
-use Phlib\Console\Command\DaemonCommand;
+use Phlib\ConsoleProcess\Command\DaemonCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

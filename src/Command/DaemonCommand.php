@@ -1,6 +1,6 @@
 <?php
 
-namespace Phlib\Console\Command;
+namespace Phlib\ConsoleProcess\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class DaemonCommand
- * @package Phlib\Console\Console
+ * @package Phlib\ConsoleProcess\Console
  */
 class DaemonCommand extends BackgroundCommand
 {

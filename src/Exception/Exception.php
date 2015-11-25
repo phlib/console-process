@@ -1,6 +1,6 @@
 <?php
 
-namespace Phlib\Console\Exception;
+namespace Phlib\ConsoleProcess\Exception;
 
 interface Exception
 {

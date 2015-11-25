@@ -1,6 +1,6 @@
 <?php
 
-namespace Phlib\Console\Tests\Command;
+namespace Phlib\ConsoleProcess\Tests\Command;
 
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Application;
@@ -69,7 +69,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testInstanceOfBackgroundCommand()
     {
-        $this->assertInstanceOf('\Phlib\Console\Command\BackgroundCommand', $this->command);
+        $this->assertInstanceOf('\Phlib\ConsoleProcess\Command\BackgroundCommand', $this->command);
     }
 
     public function testPidFileArgumentIsAdded()
@@ -93,7 +93,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
     public function testForkFails()
     {
         $this->setupStartFunctions(-1);
-        $pcntl_signal = $this->getFunctionMock('\Phlib\Console\Command', 'pcntl_signal');
+        $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
         $pcntl_signal->expects($this->any())
             ->will($this->returnValue(true));
 
@@ -110,7 +110,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
     public function testChildFailsToGetSession()
     {
         $this->setupStartFunctions(null, -1);
-        $pcntl_signal = $this->getFunctionMock('\Phlib\Console\Command', 'pcntl_signal');
+        $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
         $pcntl_signal->expects($this->any())
             ->will($this->returnValue(true));
 
@@ -126,7 +126,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $expected = 'execute called';
         $this->command->setExecuteOutput($expected);
         $this->setupStartFunctions(null);
-        $pcntl_signal = $this->getFunctionMock('\Phlib\Console\Command', 'pcntl_signal');
+        $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
         $pcntl_signal->expects($this->any())
             ->will($this->returnValue(true));
 
@@ -143,7 +143,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $expected = 'onShutdown called';
         $this->command->setShutdownOutput($expected);
         $this->setupStartFunctions(null);
-        $pcntl_signal = $this->getFunctionMock('\Phlib\Console\Command', 'pcntl_signal');
+        $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
         $pcntl_signal->expects($this->any())
             ->will($this->returnValue(true));
 
@@ -160,7 +160,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $expected = 231;
         $this->setupStopFunctions($expected);
 
-        $posix_kill = $this->getFunctionMock('\Phlib\Console\Command', 'posix_kill');
+        $posix_kill = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'posix_kill');
         $posix_kill->expects($this->atLeast(2))->with($this->equalTo($expected))->willReturn(false);
 
         $this->tester->execute([
@@ -177,7 +177,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 //        $expected = 231;
 //        $this->setupStopFunctions($expected);
 //
-//        $posix_kill = $this->getFunctionMock('\Phlib\Console\Command', 'posix_kill');
+//        $posix_kill = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'posix_kill');
 //        $posix_kill->expects($this->atLeast(2))->with($this->equalTo($expected))->willReturn(false);
 //
 //        $this->tester->execute([
@@ -188,7 +188,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 
     protected function setupStartFunctions($fork, $setsid = 0, $fexists = false, $writeable = true, $putContents = true)
     {
-        $namespace = '\Phlib\Console\Command';
+        $namespace = '\Phlib\ConsoleProcess\Command';
 
         $pcntl_fork = $this->getFunctionMock($namespace, 'pcntl_fork');
         $pcntl_fork->expects($this->any())->willReturn($fork);
@@ -214,7 +214,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 
     protected function setupStopFunctions($pid, $fexists = true, $opened = true, $withPosixKill = false)
     {
-        $namespace = '\Phlib\Console\Command';
+        $namespace = '\Phlib\ConsoleProcess\Command';
 
         $file_exists = $this->getFunctionMock($namespace, 'file_exists');
         $file_exists->expects($this->any())->willReturn($fexists);
