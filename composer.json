@@ -2,7 +2,7 @@
     "name": "phlib/console",
     "type": "library",
     "description": "Console implementation.",
-    "keywords": ["symfony", "console", "daemon", "background"],
+    "keywords": ["symfony", "console", "daemon", "background", "pcntl", "posix"],
     "license": "MIT",
     "authors": [
         {
@@ -13,6 +13,9 @@
     ],
     "require": {
         "php": "~5.4",
+        "ext-pcntl" : "*",
+        "ext-posix" : "*",
+
         "symfony/console": "^2.7"
     },
     "require-dev": {
