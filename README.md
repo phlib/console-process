@@ -37,8 +37,6 @@ class MyProcessCommand extends BackgroundCommand
     {
         $this->setName('my:process')
             ->setDescription('My background process.');
-            
-        $this->processingDelay = 3;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -52,7 +50,7 @@ class MyProcessCommand extends BackgroundCommand
 ## Daemon Command
 ### Basic Usage
 
-Apart from extending a different class, the Daemon Command looks and works in the same way as the Background
+Apart from extending a different class, the Daemon Command looks and works in a similar way to the Background
 Command.
 
 ```php
@@ -68,8 +66,6 @@ class MyProcessCommand extends DaemonCommand
     {
         $this->setName('my:process')
             ->setDescription('My background process.');
-            
-        $this->processingDelay = 3;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
