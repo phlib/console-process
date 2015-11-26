@@ -24,12 +24,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Phlib\\Console\\": "src/"
+            "Phlib\\ConsoleProcess\\": "src/"
         }
     },
     "autoload-dev": {
        "psr-4": {
-           "Phlib\\Console\\Tests\\": "tests/"
+           "Phlib\\ConsoleProcess\\Tests\\": "tests/"
        }
     }
 }
