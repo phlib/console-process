@@ -1,5 +1,5 @@
 {
-    "name": "phlib/console",
+    "name": "phlib/console-process",
     "type": "library",
     "description": "Console implementation.",
     "keywords": ["symfony", "console", "daemon", "background", "pcntl", "posix"],
