@@ -211,8 +211,9 @@ class DaemonCommand extends BackgroundCommand
         $pidFile = $input->getOption('pid-file');
         if ($pidFile === false) {
             // no file specified, generate our own name
-            $name = str_replace([' '], ['-'], $this->getName());
-            $pidFile = __DIR__ . $name . '.pid';
+            $baseDir = getcwd();
+            $name    = str_replace(' ', '-', strtolower($this->getName()));
+            $pidFile = $baseDir . DIRECTORY_SEPARATOR . $name . '.pid';
         }
 
         return $pidFile;
