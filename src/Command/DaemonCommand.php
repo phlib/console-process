@@ -187,7 +187,7 @@ class DaemonCommand extends BackgroundCommand
 
         $running = posix_kill($pid, 0);
         if ($running) {
-            $output->writeln("Running");
+            $output->writeln("Running (PID: $pid)");
         } else {
             $output->writeln("Not running");
         }
