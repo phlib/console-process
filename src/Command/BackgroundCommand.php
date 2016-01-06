@@ -35,7 +35,7 @@ class BackgroundCommand extends Command
     /**
      * @inheritdoc
      */
-    public function __construct($name)
+    public function __construct($name = null)
     {
         parent::__construct($name);
 
