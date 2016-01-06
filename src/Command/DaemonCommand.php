@@ -93,7 +93,9 @@ class DaemonCommand extends BackgroundCommand
 
             // child shouldn't hold onto parents input/output
             $input = clone $input;
+            $verbosityLevel = $output->getVerbosity();
             $output = $this->createChildOutput();
+            $output->setVerbosity($verbosityLevel);
             $this->onAfterDaemonizeChild($input, $output);
         }
 
