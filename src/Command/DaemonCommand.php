@@ -28,7 +28,7 @@ class DaemonCommand extends BackgroundCommand
     {
         $this->addArgument('action', InputArgument::REQUIRED, 'Start, stop or status.')
             ->addOption('pid-file', 'p', InputOption::VALUE_REQUIRED, 'PID file location.', false)
-            ->addOption('no-daemonize', 'd', InputOption::VALUE_NONE, 'Do not daemonize the process.');
+            ->addOption('daemonize', 'd', InputOption::VALUE_NONE, 'Make the process run in the background and detach.');
     }
 
     /**
@@ -83,7 +83,7 @@ class DaemonCommand extends BackgroundCommand
             throw new \InvalidArgumentException(sprintf("Can not write to PID file '%s'", $pidFile));
         }
 
-        if (!$input->getOption('no-daemonize')) {
+        if ($input->getOption('daemonize')) {
             $this->onBeforeDaemonize($input, $output);
             $isChild = $this->daemonize();
             if (!$isChild) {
