@@ -68,11 +68,17 @@ class BackgroundCommand extends Command
      */
     protected function background(InputInterface $input, OutputInterface $output)
     {
-        $this->registerSignals();
+        $this->registerSignals($output);
+        if ($output->isVerbose()) {
+            $output->writeln('Background PCNTL Signals registered.');
+        }
         while ($this->continue) {
             call_user_func($this->backgroundExecute, $input, $output);
             $this->sleep();
             pcntl_signal_dispatch();
+        }
+        if ($output->isVerbose()) {
+            $output->writeln('Background process shutting down.');
         }
         $this->onShutdown($input, $output);
     }
@@ -117,12 +123,18 @@ class BackgroundCommand extends Command
 
     /**
      * Register each of the added signals for each of the callbacks.
+     * @param OutputInterface $output
      */
-    private function registerSignals()
+    private function registerSignals(OutputInterface $output)
     {
         foreach ($this->signalCallbacks as $signal => $callbacks) {
             foreach ($callbacks as $callback) {
-                pcntl_signal($signal, $callback);
+                pcntl_signal($signal, function() use ($signal, $output, $callback) {
+                    if ($output->isVerbose()) {
+                        $output->writeln("Received signal '$signal', calling registered callback.");
+                    }
+                    return $callback();
+                });
             }
         }
     }
