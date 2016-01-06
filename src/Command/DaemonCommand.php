@@ -87,6 +87,9 @@ class DaemonCommand extends BackgroundCommand
             $this->onBeforeDaemonize($input, $output);
             $isChild = $this->daemonize();
             if (!$isChild) {
+                if ($output->isVerbose()) {
+                    $output->writeln('Parent process completing.');
+                }
                 $this->onAfterDaemonizeParent($input, $output);
                 return;
             }
@@ -96,6 +99,8 @@ class DaemonCommand extends BackgroundCommand
             $verbosityLevel = $output->getVerbosity();
             $output = $this->createChildOutput();
             $output->setVerbosity($verbosityLevel);
+
+            $output->writeln('Child process forked.');
             $this->onAfterDaemonizeChild($input, $output);
         }
 
@@ -103,14 +108,17 @@ class DaemonCommand extends BackgroundCommand
         if (!$written) {
             throw new \RuntimeException(sprintf("Failed to write PID file '%s'", $pidFile));
         }
+        $output->writeln("PID file written to '$pidFile'.");
 
         try {
+            $output->writeln("Daemon executing main process.");
             parent::background($input, $output);
         } catch (\Exception $e) {
             unlink($pidFile);
             throw $e;
         }
 
+        $output->writeln("Daemon process shutting down.");
         unlink($pidFile);
     }
 
