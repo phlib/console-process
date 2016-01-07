@@ -84,7 +84,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testDaemonOptionIsAdded()
     {
-        $this->assertTrue($this->command->getDefinition()->hasOption('no-daemonize'));
+        $this->assertTrue($this->command->getDefinition()->hasOption('daemonize'));
     }
 
     /**
@@ -100,7 +100,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->tester->execute([
             'action' => 'start',
             '-p'     => '/path/to/my.pid',
-            '-d'     => false
+            '-d'     => true
         ]);
     }
 
@@ -117,7 +117,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->tester->execute([
             'action' => 'start',
             '-p'     => '/path/to/my.pid',
-            '-d'     => false
+            '-d'     => true
         ]);
     }
 
@@ -133,9 +133,9 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->tester->execute([
             'action' => 'start',
             '-p'     => '/path/to/my.pid',
-            '-d'     => false
+            '-d'     => true
         ]);
-        $this->assertEquals("$expected\n", $this->tester->getDisplay());
+        $this->assertContains("$expected\n", $this->tester->getDisplay());
     }
 
     public function testChildCallsOnShutdown()
@@ -150,9 +150,9 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->tester->execute([
             'action' => 'start',
             '-p'     => '/path/to/my.pid',
-            '-d'     => false
+            '-d'     => true
         ]);
-        $this->assertEquals("$expected\n", $this->tester->getDisplay());
+        $this->assertContains("$expected\n", $this->tester->getDisplay());
     }
 
     public function testStoppingSuccessfully()
