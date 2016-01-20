@@ -77,13 +77,14 @@ class DaemonCommand extends BackgroundCommand
      */
     private function start(InputInterface $input, OutputInterface $output)
     {
-        // pid file check
-        $pidFile = $this->getPidFilename($input);
-        if (file_exists($pidFile) || !is_writable(dirname($pidFile))) {
-            throw new \InvalidArgumentException(sprintf("Can not write to PID file '%s'", $pidFile));
-        }
-
+        $pidFile = null;
         if ($input->getOption('daemonize')) {
+            // pid file check
+            $pidFile = $this->getPidFilename($input);
+            if (file_exists($pidFile) || !is_writable(dirname($pidFile))) {
+                throw new \InvalidArgumentException(sprintf("Can not write to PID file '%s'", $pidFile));
+            }
+
             $this->onBeforeDaemonize($input, $output);
             $isChild = $this->daemonize();
             if (!$isChild) {
@@ -94,32 +95,34 @@ class DaemonCommand extends BackgroundCommand
                 return;
             }
 
-            // child shouldn't hold onto parents input/output
-            $input = clone $input;
-            $verbosityLevel = $output->getVerbosity();
-            $output = $this->createChildOutput();
-            $output->setVerbosity($verbosityLevel);
+            // children shouldn't hold onto parents input/output
+            $input  = $this->recreateInput($input);
+            $output = $this->recreateOutput($output);
 
             $output->writeln('Child process forked.');
             $this->onAfterDaemonizeChild($input, $output);
-        }
 
-        $written = file_put_contents($pidFile, getmypid());
-        if (!$written) {
-            throw new \RuntimeException(sprintf("Failed to write PID file '%s'", $pidFile));
+            $written = file_put_contents($pidFile, getmypid());
+            if (!$written) {
+                throw new \RuntimeException(sprintf("Failed to write PID file '%s'", $pidFile));
+            }
+            $output->writeln("PID file written to '$pidFile'.");
         }
-        $output->writeln("PID file written to '$pidFile'.");
 
         try {
             $output->writeln("Daemon executing main process.");
             parent::background($input, $output);
         } catch (\Exception $e) {
-            unlink($pidFile);
+            if ($pidFile !== null && file_exists($pidFile)) {
+                unlink($pidFile);
+            }
             throw $e;
         }
 
         $output->writeln("Daemon process shutting down.");
-        unlink($pidFile);
+        if ($pidFile !== null && file_exists($pidFile)) {
+            unlink($pidFile);
+        }
     }
 
     /**
@@ -201,6 +204,27 @@ class DaemonCommand extends BackgroundCommand
         } else {
             $output->writeln("Not running");
         }
+    }
+
+    /**
+     * @param InputInterface $input
+     * @return InputInterface
+     */
+    protected function recreateInput(InputInterface $input)
+    {
+        return clone $input;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return OutputInterface
+     */
+    protected function recreateOutput(OutputInterface $output)
+    {
+        $verbosityLevel = $output->getVerbosity();
+        $newInstance = $this->createChildOutput();
+        $newInstance->setVerbosity($verbosityLevel);
+        return $newInstance;
     }
 
     /**
