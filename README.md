@@ -9,7 +9,7 @@ Console signal implementation using [PHPs Process control functions](http://php.
 There are 2 implementations.
 
 1. Background command. Allows a process to be interrupted using the signal handler.
-2. Daemon command. Builds on the Background command to allow forking the process.
+2. Daemon command. Builds on the Background command to allow forking (detaching) the process.
 
 ## Install
 
@@ -51,7 +51,8 @@ class MyProcessCommand extends BackgroundCommand
 ### Basic Usage
 
 Apart from extending a different class, the Daemon Command looks and works in a similar way to the Background
-Command.
+Command. The PID file argument is optional. If it is not specified the process generates it's own PID file based 
+on the command name.
 
 ```php
 <?php
@@ -77,9 +78,18 @@ class MyProcessCommand extends DaemonCommand
 ```
 
 ```bash
-# path/to/my/process /path/to/my.pid start -d
+# path/to/my/process start -d
 ```
 
 ```bash
-# path/to/my/process /path/to/my.pid stop
+# path/to/my/process stop
 ```
+
+
+## Command Line Options
+|Name|Type|Short|Required|Default|Description|
+|----|----|-----|--------|-------|-----------|
+|action|Argument||yes||start, stop, status|
+|daemonize|Option|d|no|no|Detaches the process|
+|pid-file|Option|p|no|auto|Name of the PID file to use. Not used if daemonize is not set|
+
