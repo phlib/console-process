@@ -87,9 +87,9 @@ class MyProcessCommand extends DaemonCommand
 
 
 ## Command Line Options
-|Name|Type|Short|Required|Default|Description|
+|Name|Short|Type|Required|Default|Description|
 |----|----|-----|--------|-------|-----------|
-|action|Argument||yes||start, stop, status|
-|daemonize|Option|d|no|no|Detaches the process|
-|pid-file|Option|p|no|auto|Name of the PID file to use. Not used if daemonize is not set|
+|action||Argument|yes||start, stop, status|
+|daemonize|d|Option|no|no|Detaches the process|
+|pid-file|p|Option|no|auto|Name of the PID file to use. Not used if daemonize is not set.|
 
