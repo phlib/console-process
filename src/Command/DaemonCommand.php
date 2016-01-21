@@ -81,8 +81,11 @@ class DaemonCommand extends BackgroundCommand
         if ($input->getOption('daemonize')) {
             // pid file check
             $pidFile = $this->getPidFilename($input);
-            if (file_exists($pidFile) || !is_writable(dirname($pidFile))) {
-                throw new \InvalidArgumentException(sprintf("Can not write to PID file '%s'", $pidFile));
+            if (file_exists($pidFile)) {
+                throw new \InvalidArgumentException(sprintf("PID file '%s' already exists.", $pidFile));
+            }
+            if (!is_writable(dirname($pidFile))) {
+                throw new \InvalidArgumentException(sprintf("Can not write to PID file '%s'.", $pidFile));
             }
 
             $this->onBeforeDaemonize($input, $output);
