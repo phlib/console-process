@@ -52,10 +52,6 @@ class BackgroundCommand extends Command
      */
     public function setCode(callable $code)
     {
-        if (!is_callable($code)) {
-            throw new \InvalidArgumentException('Invalid callable provided to BackgroundCommand::setCode.');
-        }
-
         $this->backgroundExecute = $code;
 
         return $this;
