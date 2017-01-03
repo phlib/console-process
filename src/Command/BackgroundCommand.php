@@ -50,7 +50,7 @@ class BackgroundCommand extends Command
     /**
      * @inheritdoc
      */
-    public function setCode($code)
+    public function setCode(callable $code)
     {
         if (!is_callable($code)) {
             throw new \InvalidArgumentException('Invalid callable provided to BackgroundCommand::setCode.');
