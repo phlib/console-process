@@ -64,7 +64,7 @@ class BackgroundCommand extends Command
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return null|int null or 0 if everything went fine, or an error code
+     * @throws \Exception
      */
     protected function background(InputInterface $input, OutputInterface $output)
     {
@@ -72,11 +72,19 @@ class BackgroundCommand extends Command
         if ($output->isVerbose()) {
             $output->writeln('Background PCNTL Signals registered.');
         }
+
         while ($this->continue) {
-            call_user_func($this->backgroundExecute, $input, $output);
-            $this->sleep();
-            pcntl_signal_dispatch();
+            try {
+                call_user_func($this->backgroundExecute, $input, $output);
+                pcntl_signal_dispatch();
+                $this->sleep();
+            } catch (\Exception $e) {
+                $this->shutdown();
+                $this->onException($e, $input, $output);
+                throw $e;
+            }
         }
+
         if ($output->isVerbose()) {
             $output->writeln('Background process shutting down.');
         }
@@ -96,6 +104,15 @@ class BackgroundCommand extends Command
      * @param OutputInterface $output
      */
     protected function onShutdown(InputInterface $input, OutputInterface $output)
+    {
+    }
+
+    /**
+     * @param \Exception $e
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    protected function onException(\Exception $e, InputInterface $input, OutputInterface $output)
     {
     }
 
