@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Console implementation.",
     "keywords": ["symfony", "console", "daemon", "background", "pcntl", "posix"],
-    "license": "MIT",
+    "license": "LGPL-3.0",
     "authors": [
         {
             "name": "Luke Richards",

@@ -4,6 +4,7 @@
 [![Codecov](https://img.shields.io/codecov/c/github/phlib/console-process.svg)](https://codecov.io/gh/phlib/console-process)
 [![Latest Stable Version](https://img.shields.io/packagist/v/phlib/console-process.svg)](https://packagist.org/packages/phlib/console-process)
 [![Total Downloads](https://img.shields.io/packagist/dt/phlib/console-process.svg)](https://packagist.org/packages/phlib/console-process)
+![Licence](https://img.shields.io/github/license/phlib/console-process.svg)
 
 Console signal implementation using [PHPs Process control functions](http://php.net/manual/en/book.pcntl.php).
 
@@ -164,3 +165,17 @@ class MyProcessCommand extends DaemonCommand
 |daemonize|d|Option|no|no|Detaches the process|
 |pid-file|p|Option|no|auto|Name of the PID file to use. Not used if daemonize is not set.|
 
+## License
+
+This package is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
