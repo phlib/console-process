@@ -1,6 +1,7 @@
 # phlib/console-process
 
 [![Build Status](https://img.shields.io/travis/phlib/console-process/master.svg)](https://travis-ci.org/phlib/console-process)
+[![Codecov](https://img.shields.io/codecov/c/github/phlib/console-process.svg)](https://codecov.io/gh/phlib/console-process)
 [![Latest Stable Version](https://img.shields.io/packagist/v/phlib/console-process.svg)](https://packagist.org/packages/phlib/console-process)
 [![Total Downloads](https://img.shields.io/packagist/dt/phlib/console-process.svg)](https://packagist.org/packages/phlib/console-process)
 
