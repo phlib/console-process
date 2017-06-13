@@ -169,23 +169,6 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-//    /**
-//     * @expectedException \RuntimeException
-//     */
-//    public function testStoppingWhenInvalidPidFile()
-//    {
-//        $expected = 231;
-//        $this->setupStopFunctions($expected);
-//
-//        $posix_kill = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'posix_kill');
-//        $posix_kill->expects($this->atLeast(2))->with($this->equalTo($expected))->willReturn(false);
-//
-//        $this->tester->execute([
-//            'pid-file' => '/path/to/my.pid',
-//            'action' => 'stop'
-//        ]);
-//    }
-
     protected function setupStartFunctions($fork, $setsid = 0, $fexists = false, $writeable = true, $putContents = true)
     {
         $namespace = '\Phlib\ConsoleProcess\Command';
