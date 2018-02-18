@@ -2,7 +2,7 @@
 
 namespace Phlib\ConsoleProcess\Command;
 
-use Symfony\Component\Console\Command\Command;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class BackgroundCommand
  * @package Phlib\ConsoleProcess\Command
  */
-class BackgroundCommand extends Command
+class BackgroundCommand extends ContainerAwareCommand
 {
     /**
      * @var bool
