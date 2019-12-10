@@ -16,6 +16,7 @@ class Background extends BackgroundCommand
     {
         // do some work
         sleep(1);
+        return 0;
     }
 
     protected function onShutdown(InputInterface $input, OutputInterface $output)
