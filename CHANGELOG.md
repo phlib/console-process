@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Add a Change Log. Previous releases are shown as date only. See descriptions
   on [project releases page](https://github.com/phlib/beanstalk/releases).
+### Changed
+- Altered PHP version constraint to use SemVer. This will prevent implicit
+  support for PHP v8 when it is released. No BC break as this does not change
+  this package's support for current or past PHP versions.
 
 ## [1.0.1] - 2018-02-16
 
