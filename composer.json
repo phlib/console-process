@@ -14,10 +14,10 @@
         }
     ],
     "require": {
-        "php": "^5.5|^7",
+        "php": "^7.3",
         "ext-pcntl" : "*",
         "ext-posix" : "*",
-        "symfony/console": "^3|^4|^5"
+        "symfony/console": "^5"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.4",
