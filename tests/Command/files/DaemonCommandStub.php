@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 require_once __DIR__ . '/ExecuteStubTrait.php';
 
 use Phlib\ConsoleProcess\Command\DaemonCommand;
@@ -20,35 +22,25 @@ class DaemonCommandStub extends DaemonCommand
      */
     protected $outputCallback;
 
-    protected function onShutdown(InputInterface $input, OutputInterface $output)
+    protected function onShutdown(InputInterface $input, OutputInterface $output): void
     {
         if ($this->shutdownValue !== null) {
             $output->writeln($this->shutdownValue);
         }
     }
 
-    /**
-     * @param string $value
-     * @return $this
-     */
-    public function setShutdownOutput($value)
+    public function setShutdownOutput(string $value): self
     {
         $this->shutdownValue = $value;
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function createChildOutput()
+    protected function createChildOutput(): OutputInterface
     {
         return call_user_func($this->outputCallback);
     }
 
-    /**
-     * @return $this
-     */
-    public function setOutputCallback(\Closure $callback)
+    public function setOutputCallback(\Closure $callback): self
     {
         $this->outputCallback = $callback;
         return $this;

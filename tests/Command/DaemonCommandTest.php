@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phlib\ConsoleProcess\Tests\Command;
 
 use phpmock\phpunit\PHPMock;
@@ -30,12 +32,12 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected $tester;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         require_once __DIR__ . '/files/DaemonCommandStub.php';
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -49,7 +51,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         });
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->tester = null;
         $this->command = null;
@@ -57,32 +59,32 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         parent::tearDown();
     }
 
-    public function testInstanceOfConsoleCommand()
+    public function testInstanceOfConsoleCommand(): void
     {
         $this->assertInstanceOf('\Symfony\Component\Console\Command\Command', $this->command);
     }
 
-    public function testBaseCommandClassIsCalled()
+    public function testBaseCommandClassIsCalled(): void
     {
-        $this->assertEquals($this->commandName, $this->command->getName());
+        $this->assertSame($this->commandName, $this->command->getName());
     }
 
-    public function testInstanceOfBackgroundCommand()
+    public function testInstanceOfBackgroundCommand(): void
     {
         $this->assertInstanceOf('\Phlib\ConsoleProcess\Command\BackgroundCommand', $this->command);
     }
 
-    public function testPidFileOptionIsAdded()
+    public function testPidFileOptionIsAdded(): void
     {
         $this->assertTrue($this->command->getDefinition()->hasOption('pid-file'));
     }
 
-    public function testActionArgumentIsAdded()
+    public function testActionArgumentIsAdded(): void
     {
         $this->assertTrue($this->command->getDefinition()->hasArgument('action'));
     }
 
-    public function testDaemonOptionIsAdded()
+    public function testDaemonOptionIsAdded(): void
     {
         $this->assertTrue($this->command->getDefinition()->hasOption('daemonize'));
     }
@@ -90,7 +92,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testForkFails()
+    public function testForkFails(): void
     {
         $this->setupStartFunctions(-1);
         $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
@@ -107,7 +109,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testChildFailsToGetSession()
+    public function testChildFailsToGetSession(): void
     {
         $this->setupStartFunctions(null, -1);
         $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
@@ -121,7 +123,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    public function testChildExecutesSuccessfully()
+    public function testChildExecutesSuccessfully(): void
     {
         $expected = 'execute called';
         $this->command->setExecuteOutput($expected);
@@ -138,7 +140,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertContains("${expected}\n", $this->tester->getDisplay());
     }
 
-    public function testChildCallsOnShutdown()
+    public function testChildCallsOnShutdown(): void
     {
         $expected = 'onShutdown called';
         $this->command->setShutdownOutput($expected);
@@ -155,7 +157,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertContains("${expected}\n", $this->tester->getDisplay());
     }
 
-    public function testStoppingSuccessfully()
+    public function testStoppingSuccessfully(): void
     {
         $expected = 231;
         $this->setupStopFunctions($expected);
@@ -169,8 +171,13 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    protected function setupStartFunctions($fork, $setsid = 0, $fexists = false, $writeable = true, $putContents = true)
-    {
+    protected function setupStartFunctions(
+        ?int $fork,
+        int $setsid = 0,
+        bool $fexists = false,
+        bool $writeable = true,
+        bool $putContents = true
+    ): void {
         $namespace = '\Phlib\ConsoleProcess\Command';
 
         $pcntl_fork = $this->getFunctionMock($namespace, 'pcntl_fork');
@@ -195,8 +202,12 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         $is_writable->expects($this->any())->willReturn(true);
     }
 
-    protected function setupStopFunctions($pid, $fexists = true, $opened = true, $withPosixKill = false)
-    {
+    protected function setupStopFunctions(
+        int $pid,
+        bool $fexists = true,
+        bool $opened = true,
+        bool $withPosixKill = false
+    ): void {
         $namespace = '\Phlib\ConsoleProcess\Command';
 
         $file_exists = $this->getFunctionMock($namespace, 'file_exists');

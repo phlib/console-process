@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phlib\ConsoleProcess\Command;
 
 use Symfony\Component\Console\Command\Command;
@@ -32,7 +34,7 @@ class BackgroundCommand extends Command
      */
     private $backgroundExecute;
 
-    public function __construct($name = null)
+    public function __construct(string $name = null)
     {
         parent::__construct($name);
 
@@ -44,17 +46,14 @@ class BackgroundCommand extends Command
         $this->addSignalCallback(SIGINT, [$this, 'shutdown']);
     }
 
-    public function setCode(callable $code)
+    public function setCode(callable $code): self
     {
         $this->backgroundExecute = $code;
 
         return $this;
     }
 
-    /**
-     * @throws \Exception
-     */
-    protected function background(InputInterface $input, OutputInterface $output)
+    protected function background(InputInterface $input, OutputInterface $output): void
     {
         $this->registerSignals($output);
         if ($output->isVerbose()) {
@@ -82,32 +81,28 @@ class BackgroundCommand extends Command
     /**
      * Tell the process to stop running at the next iteration.
      */
-    protected function shutdown()
+    protected function shutdown(): void
     {
         $this->continue = false;
     }
 
-    protected function onShutdown(InputInterface $input, OutputInterface $output)
+    protected function onShutdown(InputInterface $input, OutputInterface $output): void
     {
     }
 
-    protected function onException(\Exception $e, InputInterface $input, OutputInterface $output)
+    protected function onException(\Exception $e, InputInterface $input, OutputInterface $output): void
     {
     }
 
     /**
      * Causes the process to sleep for the number of microseconds as specifed by processing delay property.
      */
-    protected function sleep()
+    protected function sleep(): void
     {
         usleep($this->processingDelay);
     }
 
-    /**
-     * @param int $signal
-     * @return $this
-     */
-    protected function addSignalCallback($signal, callable $callback)
+    protected function addSignalCallback(int $signal, callable $callback): self
     {
         if (!array_key_exists($signal, $this->signalCallbacks)) {
             $this->signalCallbacks[$signal] = [];
@@ -119,7 +114,7 @@ class BackgroundCommand extends Command
     /**
      * Register each of the added signals for each of the callbacks.
      */
-    private function registerSignals(OutputInterface $output)
+    private function registerSignals(OutputInterface $output): void
     {
         foreach ($this->signalCallbacks as $signal => $callbacks) {
             foreach ($callbacks as $callback) {
