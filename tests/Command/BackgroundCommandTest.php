@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Phlib\ConsoleProcess\Command;
 
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -25,7 +26,7 @@ class BackgroundCommandTest extends TestCase
     protected $commandName = 'foo:bar';
 
     /**
-     * @var Stub\BackgroundCommandStub|\PHPUnit_Framework_MockObject_MockObject
+     * @var Stub\BackgroundCommandStub|MockObject
      */
     protected $command;
 

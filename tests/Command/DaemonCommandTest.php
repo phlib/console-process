@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Phlib\ConsoleProcess\Command;
 
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -25,7 +26,7 @@ class DaemonCommandTest extends TestCase
     protected $commandName = 'foo:bar';
 
     /**
-     * @var Stub\DaemonCommandStub|\PHPUnit_Framework_MockObject_MockObject
+     * @var Stub\DaemonCommandStub|MockObject
      */
     protected $command;
 
@@ -86,11 +87,10 @@ class DaemonCommandTest extends TestCase
         $this->assertTrue($this->command->getDefinition()->hasOption('daemonize'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testForkFails(): void
     {
+        $this->expectException(\RuntimeException::class);
+
         $this->setupStartFunctions(-1);
         $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
         $pcntl_signal->expects($this->any())
@@ -103,11 +103,10 @@ class DaemonCommandTest extends TestCase
         ]);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testChildFailsToGetSession(): void
     {
+        $this->expectException(\RuntimeException::class);
+
         $this->setupStartFunctions(null, -1);
         $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
         $pcntl_signal->expects($this->any())
