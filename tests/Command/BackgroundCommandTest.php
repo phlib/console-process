@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Phlib\ConsoleProcess\Tests\Command;
 
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class BackgroundCommandTest extends \PHPUnit_Framework_TestCase
+class BackgroundCommandTest extends TestCase
 {
     use PHPMock;
 
@@ -23,7 +24,7 @@ class BackgroundCommandTest extends \PHPUnit_Framework_TestCase
     protected $commandName = 'foo:bar';
 
     /**
-     * @var \TestCommand|\PHPUnit_Framework_MockObject_MockObject
+     * @var \BackgroundCommandStub|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $command;
 
@@ -37,7 +38,7 @@ class BackgroundCommandTest extends \PHPUnit_Framework_TestCase
         require_once __DIR__ . '/files/BackgroundCommandStub.php';
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -48,7 +49,7 @@ class BackgroundCommandTest extends \PHPUnit_Framework_TestCase
         $this->tester = new CommandTester($this->command);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->tester = null;
         $this->command = null;
@@ -70,7 +71,7 @@ class BackgroundCommandTest extends \PHPUnit_Framework_TestCase
     {
         $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
         $pcntl_signal->expects($this->exactly(2))
-            ->withConsecutive($this->onConsecutiveCalls(SIGTERM, SIGINT));
+            ->withConsecutive([SIGTERM], [SIGINT]);
 
         $this->tester->execute([]);
     }

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Phlib\ConsoleProcess\Tests\Command;
 
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class DaemonCommandTest extends \PHPUnit_Framework_TestCase
+class DaemonCommandTest extends TestCase
 {
     use PHPMock;
 
@@ -23,7 +24,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
     protected $commandName = 'foo:bar';
 
     /**
-     * @var \TestCommand|\PHPUnit_Framework_MockObject_MockObject
+     * @var \DaemonCommandStub|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $command;
 
@@ -37,7 +38,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         require_once __DIR__ . '/files/DaemonCommandStub.php';
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -51,7 +52,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
         });
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->tester = null;
         $this->command = null;
