@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/ExecuteStubTrait.php';
+namespace Phlib\ConsoleProcess\Command\Stub;
 
 use Phlib\ConsoleProcess\Command\DaemonCommand;
 use Symfony\Component\Console\Input\InputInterface;

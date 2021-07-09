@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Phlib\ConsoleProcess\Tests\Command;
+namespace Phlib\ConsoleProcess\Command;
 
 use phpmock\phpunit\PHPMock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class DaemonCommandTest extends TestCase
@@ -24,7 +25,7 @@ class DaemonCommandTest extends TestCase
     protected $commandName = 'foo:bar';
 
     /**
-     * @var \DaemonCommandStub|\PHPUnit_Framework_MockObject_MockObject
+     * @var Stub\DaemonCommandStub|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $command;
 
@@ -33,17 +34,12 @@ class DaemonCommandTest extends TestCase
      */
     protected $tester;
 
-    public static function setUpBeforeClass(): void
-    {
-        require_once __DIR__ . '/files/DaemonCommandStub.php';
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->application = new Application();
-        $this->application->add(new \DaemonCommandStub($this->commandName));
+        $this->application->add(new Stub\DaemonCommandStub($this->commandName));
 
         $this->command = $this->application->find($this->commandName);
         $this->tester = new CommandTester($this->command);
@@ -62,7 +58,7 @@ class DaemonCommandTest extends TestCase
 
     public function testInstanceOfConsoleCommand(): void
     {
-        $this->assertInstanceOf('\Symfony\Component\Console\Command\Command', $this->command);
+        $this->assertInstanceOf(Command::class, $this->command);
     }
 
     public function testBaseCommandClassIsCalled(): void
@@ -72,7 +68,7 @@ class DaemonCommandTest extends TestCase
 
     public function testInstanceOfBackgroundCommand(): void
     {
-        $this->assertInstanceOf('\Phlib\ConsoleProcess\Command\BackgroundCommand', $this->command);
+        $this->assertInstanceOf(BackgroundCommand::class, $this->command);
     }
 
     public function testPidFileOptionIsAdded(): void
@@ -96,7 +92,7 @@ class DaemonCommandTest extends TestCase
     public function testForkFails(): void
     {
         $this->setupStartFunctions(-1);
-        $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
+        $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
         $pcntl_signal->expects($this->any())
             ->will($this->returnValue(true));
 
@@ -113,7 +109,7 @@ class DaemonCommandTest extends TestCase
     public function testChildFailsToGetSession(): void
     {
         $this->setupStartFunctions(null, -1);
-        $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
+        $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
         $pcntl_signal->expects($this->any())
             ->will($this->returnValue(true));
 
@@ -129,7 +125,7 @@ class DaemonCommandTest extends TestCase
         $expected = 'execute called';
         $this->command->setExecuteOutput($expected);
         $this->setupStartFunctions(null);
-        $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
+        $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
         $pcntl_signal->expects($this->any())
             ->will($this->returnValue(true));
 
@@ -146,7 +142,7 @@ class DaemonCommandTest extends TestCase
         $expected = 'onShutdown called';
         $this->command->setShutdownOutput($expected);
         $this->setupStartFunctions(null);
-        $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
+        $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
         $pcntl_signal->expects($this->any())
             ->will($this->returnValue(true));
 
@@ -163,7 +159,7 @@ class DaemonCommandTest extends TestCase
         $expected = 231;
         $this->setupStopFunctions($expected);
 
-        $posix_kill = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'posix_kill');
+        $posix_kill = $this->getFunctionMock(__NAMESPACE__, 'posix_kill');
         $posix_kill->expects($this->atLeast(2))->with($this->equalTo($expected))->willReturn(false);
 
         $this->tester->execute([
@@ -179,27 +175,25 @@ class DaemonCommandTest extends TestCase
         bool $writeable = true,
         bool $putContents = true
     ): void {
-        $namespace = '\Phlib\ConsoleProcess\Command';
-
-        $pcntl_fork = $this->getFunctionMock($namespace, 'pcntl_fork');
+        $pcntl_fork = $this->getFunctionMock(__NAMESPACE__, 'pcntl_fork');
         $pcntl_fork->expects($this->any())->willReturn($fork);
 
-        $posix_setsid = $this->getFunctionMock($namespace, 'posix_setsid');
+        $posix_setsid = $this->getFunctionMock(__NAMESPACE__, 'posix_setsid');
         $posix_setsid->expects($this->any())->willReturn($setsid);
 
-        $file_exists = $this->getFunctionMock($namespace, 'file_exists');
+        $file_exists = $this->getFunctionMock(__NAMESPACE__, 'file_exists');
         $file_exists->expects($this->any())->willReturn($fexists);
 
-        $is_writable = $this->getFunctionMock($namespace, 'is_writable');
+        $is_writable = $this->getFunctionMock(__NAMESPACE__, 'is_writable');
         $is_writable->expects($this->any())->willReturn($writeable);
 
-        $is_writable = $this->getFunctionMock($namespace, 'file_put_contents');
+        $is_writable = $this->getFunctionMock(__NAMESPACE__, 'file_put_contents');
         $is_writable->expects($this->any())->willReturn($putContents);
 
-        $is_writable = $this->getFunctionMock($namespace, 'unlink');
+        $is_writable = $this->getFunctionMock(__NAMESPACE__, 'unlink');
         $is_writable->expects($this->any())->willReturn(true);
 
-        $is_writable = $this->getFunctionMock($namespace, 'sleep');
+        $is_writable = $this->getFunctionMock(__NAMESPACE__, 'sleep');
         $is_writable->expects($this->any())->willReturn(true);
     }
 
@@ -209,26 +203,24 @@ class DaemonCommandTest extends TestCase
         bool $opened = true,
         bool $withPosixKill = false
     ): void {
-        $namespace = '\Phlib\ConsoleProcess\Command';
-
-        $file_exists = $this->getFunctionMock($namespace, 'file_exists');
+        $file_exists = $this->getFunctionMock(__NAMESPACE__, 'file_exists');
         $file_exists->expects($this->any())->willReturn($fexists);
 
-        $fopen = $this->getFunctionMock($namespace, 'fopen');
+        $fopen = $this->getFunctionMock(__NAMESPACE__, 'fopen');
         $fopen->expects($this->any())->willReturn($opened);
 
-        $fgets = $this->getFunctionMock($namespace, 'fgets');
+        $fgets = $this->getFunctionMock(__NAMESPACE__, 'fgets');
         $fgets->expects($this->any())->willReturn($pid);
 
-        $fclose = $this->getFunctionMock($namespace, 'fclose');
+        $fclose = $this->getFunctionMock(__NAMESPACE__, 'fclose');
         $fclose->expects($this->any())->willReturn(true);
 
         if ($withPosixKill) {
-            $posix_kill = $this->getFunctionMock($namespace, 'posix_kill');
+            $posix_kill = $this->getFunctionMock(__NAMESPACE__, 'posix_kill');
             $posix_kill->expects($this->any())->willReturn(false);
         }
 
-        $usleep = $this->getFunctionMock($namespace, 'usleep');
+        $usleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
         $usleep->expects($this->any())->willReturn(true);
     }
 }

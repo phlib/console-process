@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Phlib\ConsoleProcess\Command\Stub;
+
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
