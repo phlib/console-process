@@ -21,7 +21,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "~4.4",
-        "php-mock/php-mock-phpunit": "^0.3"
+        "php-mock/php-mock-phpunit": "^0.3",
+        "symplify/easy-coding-standard": "^9,<=9.4.15"
     },
     "autoload": {
         "psr-4": {
@@ -32,5 +33,9 @@
        "psr-4": {
            "Phlib\\ConsoleProcess\\Tests\\": "tests/"
        }
+    },
+    "scripts": {
+        "cs-check": "vendor/bin/ecs",
+        "cs-fix": "vendor/bin/ecs --fix"
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Phlib\ConsoleProcess\Tests\Command;
 
-use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Console\Application;
 use phpmock\phpunit\PHPMock;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
 
 class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -99,8 +99,8 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->tester->execute([
             'action' => 'start',
-            '-p'     => '/path/to/my.pid',
-            '-d'     => true
+            '-p' => '/path/to/my.pid',
+            '-d' => true,
         ]);
     }
 
@@ -116,8 +116,8 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->tester->execute([
             'action' => 'start',
-            '-p'     => '/path/to/my.pid',
-            '-d'     => true
+            '-p' => '/path/to/my.pid',
+            '-d' => true,
         ]);
     }
 
@@ -132,10 +132,10 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->tester->execute([
             'action' => 'start',
-            '-p'     => '/path/to/my.pid',
-            '-d'     => true
+            '-p' => '/path/to/my.pid',
+            '-d' => true,
         ]);
-        $this->assertContains("$expected\n", $this->tester->getDisplay());
+        $this->assertContains("${expected}\n", $this->tester->getDisplay());
     }
 
     public function testChildCallsOnShutdown()
@@ -149,10 +149,10 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->tester->execute([
             'action' => 'start',
-            '-p'     => '/path/to/my.pid',
-            '-d'     => true
+            '-p' => '/path/to/my.pid',
+            '-d' => true,
         ]);
-        $this->assertContains("$expected\n", $this->tester->getDisplay());
+        $this->assertContains("${expected}\n", $this->tester->getDisplay());
     }
 
     public function testStoppingSuccessfully()
@@ -165,7 +165,7 @@ class DaemonCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->tester->execute([
             'action' => 'stop',
-            '-p'     => '/path/to/my.pid'
+            '-p' => '/path/to/my.pid',
         ]);
     }
 

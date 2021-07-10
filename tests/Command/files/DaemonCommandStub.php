@@ -20,12 +20,9 @@ class DaemonCommandStub extends DaemonCommand
      */
     protected $outputCallback;
 
-    /**
-     * @inheritdoc
-     */
     protected function onShutdown(InputInterface $input, OutputInterface $output)
     {
-        if (!is_null($this->shutdownValue)) {
+        if ($this->shutdownValue !== null) {
             $output->writeln($this->shutdownValue);
         }
     }
@@ -49,7 +46,6 @@ class DaemonCommandStub extends DaemonCommand
     }
 
     /**
-     * @param \Closure $callback
      * @return $this
      */
     public function setOutputCallback(\Closure $callback)

@@ -2,9 +2,9 @@
 
 namespace Phlib\ConsoleProcess\Tests\Command;
 
-use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Console\Application;
 use phpmock\phpunit\PHPMock;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
 
 class BackgroundCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,7 +43,7 @@ class BackgroundCommandTest extends \PHPUnit_Framework_TestCase
         $this->application->add(new \BackgroundCommandStub($this->commandName));
 
         $this->command = $this->application->find($this->commandName);
-        $this->tester  = new CommandTester($this->command);
+        $this->tester = new CommandTester($this->command);
     }
 
     public function tearDown()

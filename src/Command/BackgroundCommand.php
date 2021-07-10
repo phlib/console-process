@@ -32,9 +32,6 @@ class BackgroundCommand extends Command
      */
     private $backgroundExecute;
 
-    /**
-     * @inheritdoc
-     */
     public function __construct($name = null)
     {
         parent::__construct($name);
@@ -47,9 +44,6 @@ class BackgroundCommand extends Command
         $this->addSignalCallback(SIGINT, [$this, 'shutdown']);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function setCode(callable $code)
     {
         $this->backgroundExecute = $code;
@@ -58,8 +52,6 @@ class BackgroundCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
      * @throws \Exception
      */
     protected function background(InputInterface $input, OutputInterface $output)
@@ -95,19 +87,10 @@ class BackgroundCommand extends Command
         $this->continue = false;
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
     protected function onShutdown(InputInterface $input, OutputInterface $output)
     {
     }
 
-    /**
-     * @param \Exception $e
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
     protected function onException(\Exception $e, InputInterface $input, OutputInterface $output)
     {
     }
@@ -122,7 +105,6 @@ class BackgroundCommand extends Command
 
     /**
      * @param int $signal
-     * @param callable $callback
      * @return $this
      */
     protected function addSignalCallback($signal, callable $callback)
@@ -136,15 +118,14 @@ class BackgroundCommand extends Command
 
     /**
      * Register each of the added signals for each of the callbacks.
-     * @param OutputInterface $output
      */
     private function registerSignals(OutputInterface $output)
     {
         foreach ($this->signalCallbacks as $signal => $callbacks) {
             foreach ($callbacks as $callback) {
-                pcntl_signal($signal, function() use ($signal, $output, $callback) {
+                pcntl_signal($signal, function () use ($signal, $output, $callback) {
                     if ($output->isVerbose()) {
-                        $output->writeln("Received signal '$signal', calling registered callback.");
+                        $output->writeln("Received signal '${signal}', calling registered callback.");
                     }
                     return $callback();
                 });
