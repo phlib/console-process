@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Add specific support for PHP v8
+- Type declarations have been added to all method parameters and return types.
+### Changed
+- `DaemonCommand::background()` no longer tries to return the result of the
+  action it calls, which was always void anyway.
+- The return type for `DaemonCommand::createChildOutput()` has been set as
+  `OutputInterface` rather than the previous docblock hint of
+  `ConsoleOutputInterface`. This is because the default value returned does not
+  fit the original requirement, and the method's usage in
+  `DaemonCommand::recreateOutput()` allows for `OutputInterface`.
+  The new type is a superset of the original so any extensions of
+  `DaemonCommand` will be unaffected.
+### Removed
+- **BC break**: Removed support for PHP versions <= v7.2 as they are no longer
+  [actively supported](https://php.net/supported-versions.php) by the PHP project.
 
 ## [1.0.2] - 2019-12-10
 ### Added

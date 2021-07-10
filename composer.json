@@ -14,14 +14,15 @@
         }
     ],
     "require": {
-        "php": "^5.5|^7",
+        "php": "^7.3|^8.0",
         "ext-pcntl" : "*",
         "ext-posix" : "*",
-        "symfony/console": "^3|^4|^5"
+        "symfony/console": "^5"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.4",
-        "php-mock/php-mock-phpunit": "^0.3"
+        "phpunit/phpunit": "^9",
+        "php-mock/php-mock-phpunit": "^2",
+        "symplify/easy-coding-standard": "^9,<=9.4.15"
     },
     "autoload": {
         "psr-4": {
@@ -30,7 +31,11 @@
     },
     "autoload-dev": {
        "psr-4": {
-           "Phlib\\ConsoleProcess\\Tests\\": "tests/"
+           "Phlib\\ConsoleProcess\\": "tests/"
        }
+    },
+    "scripts": {
+        "cs-check": "vendor/bin/ecs",
+        "cs-fix": "vendor/bin/ecs --fix"
     }
 }

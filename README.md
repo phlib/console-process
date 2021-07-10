@@ -1,9 +1,9 @@
 # phlib/console-process
 
-[![Build Status](https://img.shields.io/travis/phlib/console-process/master.svg)](https://travis-ci.org/phlib/console-process)
-[![Codecov](https://img.shields.io/codecov/c/github/phlib/console-process.svg)](https://codecov.io/gh/phlib/console-process)
-[![Latest Stable Version](https://img.shields.io/packagist/v/phlib/console-process.svg)](https://packagist.org/packages/phlib/console-process)
-[![Total Downloads](https://img.shields.io/packagist/dt/phlib/console-process.svg)](https://packagist.org/packages/phlib/console-process)
+[![Code Checks](https://img.shields.io/github/workflow/status/phlib/console-process/CodeChecks?logo=github)](https://github.com/phlib/console-process/actions/workflows/code-checks.yml)
+[![Codecov](https://img.shields.io/codecov/c/github/phlib/console-process.svg?logo=codecov)](https://codecov.io/gh/phlib/console-process)
+[![Latest Stable Version](https://img.shields.io/packagist/v/phlib/console-process.svg?logo=packagist)](https://packagist.org/packages/phlib/console-process)
+[![Total Downloads](https://img.shields.io/packagist/dt/phlib/console-process.svg?logo=packagist)](https://packagist.org/packages/phlib/console-process)
 ![Licence](https://img.shields.io/github/license/phlib/console-process.svg)
 
 Console signal implementation using [PHPs Process control functions](http://php.net/manual/en/book.pcntl.php).

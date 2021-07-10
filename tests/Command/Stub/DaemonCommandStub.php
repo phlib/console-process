@@ -1,6 +1,8 @@
 <?php
 
-require_once __DIR__ . '/ExecuteStubTrait.php';
+declare(strict_types=1);
+
+namespace Phlib\ConsoleProcess\Command\Stub;
 
 use Phlib\ConsoleProcess\Command\DaemonCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,39 +22,25 @@ class DaemonCommandStub extends DaemonCommand
      */
     protected $outputCallback;
 
-    /**
-     * @inheritdoc
-     */
-    protected function onShutdown(InputInterface $input, OutputInterface $output)
+    protected function onShutdown(InputInterface $input, OutputInterface $output): void
     {
-        if (!is_null($this->shutdownValue)) {
+        if ($this->shutdownValue !== null) {
             $output->writeln($this->shutdownValue);
         }
     }
 
-    /**
-     * @param string $value
-     * @return $this
-     */
-    public function setShutdownOutput($value)
+    public function setShutdownOutput(string $value): self
     {
         $this->shutdownValue = $value;
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function createChildOutput()
+    protected function createChildOutput(): OutputInterface
     {
         return call_user_func($this->outputCallback);
     }
 
-    /**
-     * @param \Closure $callback
-     * @return $this
-     */
-    public function setOutputCallback(\Closure $callback)
+    public function setOutputCallback(\Closure $callback): self
     {
         $this->outputCallback = $callback;
         return $this;

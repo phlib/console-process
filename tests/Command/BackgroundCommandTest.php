@@ -1,12 +1,17 @@
 <?php
 
-namespace Phlib\ConsoleProcess\Tests\Command;
+declare(strict_types=1);
 
-use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Console\Application;
+namespace Phlib\ConsoleProcess\Command;
+
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\CommandTester;
 
-class BackgroundCommandTest extends \PHPUnit_Framework_TestCase
+class BackgroundCommandTest extends TestCase
 {
     use PHPMock;
 
@@ -21,7 +26,7 @@ class BackgroundCommandTest extends \PHPUnit_Framework_TestCase
     protected $commandName = 'foo:bar';
 
     /**
-     * @var \TestCommand|\PHPUnit_Framework_MockObject_MockObject
+     * @var Stub\BackgroundCommandStub|MockObject
      */
     protected $command;
 
@@ -30,23 +35,18 @@ class BackgroundCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected $tester;
 
-    public static function setUpBeforeClass()
-    {
-        require_once __DIR__ . '/files/BackgroundCommandStub.php';
-    }
-
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->application = new Application();
-        $this->application->add(new \BackgroundCommandStub($this->commandName));
+        $this->application->add(new Stub\BackgroundCommandStub($this->commandName));
 
         $this->command = $this->application->find($this->commandName);
-        $this->tester  = new CommandTester($this->command);
+        $this->tester = new CommandTester($this->command);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->tester = null;
         $this->command = null;
@@ -54,21 +54,21 @@ class BackgroundCommandTest extends \PHPUnit_Framework_TestCase
         parent::tearDown();
     }
 
-    public function testInstanceOfConsoleCommand()
+    public function testInstanceOfConsoleCommand(): void
     {
-        $this->assertInstanceOf('\Symfony\Component\Console\Command\Command', $this->command);
+        static::assertInstanceOf(Command::class, $this->command);
     }
 
-    public function testBaseCommandClassIsCalled()
+    public function testBaseCommandClassIsCalled(): void
     {
-        $this->assertEquals($this->commandName, $this->command->getName());
+        static::assertSame($this->commandName, $this->command->getName());
     }
 
-    public function testDefaultSignalCallbacksAreCreated()
+    public function testDefaultSignalCallbacksAreCreated(): void
     {
-        $pcntl_signal = $this->getFunctionMock('\Phlib\ConsoleProcess\Command', 'pcntl_signal');
-        $pcntl_signal->expects($this->exactly(2))
-            ->withConsecutive($this->onConsecutiveCalls(SIGTERM, SIGINT));
+        $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
+        $pcntl_signal->expects(static::exactly(2))
+            ->withConsecutive([SIGTERM], [SIGINT]);
 
         $this->tester->execute([]);
     }

@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phlib\ConsoleProcess\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -15,67 +16,42 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DaemonCommand extends BackgroundCommand
 {
-    /**
-     * @inheritdoc
-     */
-    public function __construct($name = null)
+    public function __construct(string $name = null)
     {
         parent::__construct($name);
         $this->configureDaemon();
     }
 
-    protected function configureDaemon()
+    protected function configureDaemon(): void
     {
         $this->addArgument('action', InputArgument::REQUIRED, 'Start, stop or status.')
             ->addOption('pid-file', 'p', InputOption::VALUE_REQUIRED, 'PID file location.', false)
             ->addOption('daemonize', 'd', InputOption::VALUE_NONE, 'Make the process run in the background and detach.');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
-    protected function onBeforeDaemonize(InputInterface $input, OutputInterface $output)
+    protected function onBeforeDaemonize(InputInterface $input, OutputInterface $output): void
     {
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
-    protected function onAfterDaemonizeParent(InputInterface $input, OutputInterface $output)
+    protected function onAfterDaemonizeParent(InputInterface $input, OutputInterface $output): void
     {
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
-    protected function onAfterDaemonizeChild(InputInterface $input, OutputInterface $output)
+    protected function onAfterDaemonizeChild(InputInterface $input, OutputInterface $output): void
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function background(InputInterface $input, OutputInterface $output)
+    protected function background(InputInterface $input, OutputInterface $output): void
     {
         $action = strtolower($input->getArgument('action'));
-        if (!in_array($action, ['start', 'stop', 'status'])) {
+        if (!in_array($action, ['start', 'stop', 'status'], true)) {
             throw new \InvalidArgumentException("Provided action is invalid, expecting 'start', 'stop' or 'status'.");
         }
 
-        return $this->$action($input, $output);
+        $this->{$action}($input, $output);
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \Exception
-     */
-    private function start(InputInterface $input, OutputInterface $output)
+    private function start(InputInterface $input, OutputInterface $output): void
     {
         $pidFile = null;
         if ($input->getOption('daemonize')) {
@@ -99,7 +75,7 @@ class DaemonCommand extends BackgroundCommand
             }
 
             // children shouldn't hold onto parents input/output
-            $input  = $this->recreateInput($input);
+            $input = $this->recreateInput($input);
             $output = $this->recreateOutput($output);
 
             $output->writeln('Child process forked.');
@@ -109,11 +85,11 @@ class DaemonCommand extends BackgroundCommand
             if (!$written) {
                 throw new \RuntimeException(sprintf("Failed to write PID file '%s'", $pidFile));
             }
-            $output->writeln("PID file written to '$pidFile'.");
+            $output->writeln("PID file written to '${pidFile}'.");
         }
 
         try {
-            $output->writeln("Daemon executing main process.");
+            $output->writeln('Daemon executing main process.');
             parent::background($input, $output);
         } catch (\Exception $e) {
             if ($pidFile !== null && file_exists($pidFile)) {
@@ -122,7 +98,7 @@ class DaemonCommand extends BackgroundCommand
             throw $e;
         }
 
-        $output->writeln("Daemon process shutting down.");
+        $output->writeln('Daemon process shutting down.');
         if ($pidFile !== null && file_exists($pidFile)) {
             unlink($pidFile);
         }
@@ -131,16 +107,14 @@ class DaemonCommand extends BackgroundCommand
     /**
      * Split into a new process. Returns true when it's the child process and false
      * for the parent process.
-     *
-     * @return bool
      */
-    private function daemonize()
+    private function daemonize(): bool
     {
         // prevent permission issues
         umask(0);
 
         $pid = pcntl_fork();
-        if ($pid == -1) {
+        if ($pid === -1) {
             /* fork failed */
             throw new \RuntimeException('Failed to fork the daemon.');
         } elseif ($pid) {
@@ -149,18 +123,14 @@ class DaemonCommand extends BackgroundCommand
         }
 
         // make ourselves the session leader
-        if (posix_setsid() == -1) {
+        if (posix_setsid() === -1) {
             throw new \RuntimeException('Failed to become a daemon.');
         }
 
         return true;
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
-    private function stop(InputInterface $input, OutputInterface $output)
+    private function stop(InputInterface $input, OutputInterface $output): void
     {
         $pidFile = $this->getPidFilename($input);
 
@@ -177,25 +147,21 @@ class DaemonCommand extends BackgroundCommand
             do {
                 posix_kill($pid, SIGTERM);
                 usleep(500000);
-            } while(posix_kill($pid, 0));
+            } while (posix_kill($pid, 0));
         }
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
-    private function status(InputInterface $input, OutputInterface $output)
+    private function status(InputInterface $input, OutputInterface $output): void
     {
         $pidFile = $this->getPidFilename($input);
         if (!file_exists($pidFile)) {
-            $output->writeln("Not running");
+            $output->writeln('Not running');
             return;
         }
 
         $fileHandle = @fopen($pidFile, 'r');
         if (!$fileHandle) {
-            $output->writeln("PID file exists but is not readable.");
+            $output->writeln('PID file exists but is not readable.');
         }
 
         $pid = (int)fgets($fileHandle);
@@ -203,26 +169,18 @@ class DaemonCommand extends BackgroundCommand
 
         $running = posix_kill($pid, 0);
         if ($running) {
-            $output->writeln("Running (PID: $pid)");
+            $output->writeln("Running (PID: ${pid})");
         } else {
-            $output->writeln("Not running");
+            $output->writeln('Not running');
         }
     }
 
-    /**
-     * @param InputInterface $input
-     * @return InputInterface
-     */
-    protected function recreateInput(InputInterface $input)
+    protected function recreateInput(InputInterface $input): InputInterface
     {
         return clone $input;
     }
 
-    /**
-     * @param OutputInterface $output
-     * @return OutputInterface
-     */
-    protected function recreateOutput(OutputInterface $output)
+    protected function recreateOutput(OutputInterface $output): OutputInterface
     {
         $verbosityLevel = $output->getVerbosity();
         $newInstance = $this->createChildOutput();
@@ -230,26 +188,19 @@ class DaemonCommand extends BackgroundCommand
         return $newInstance;
     }
 
-    /**
-     * @return ConsoleOutputInterface
-     */
-    protected function createChildOutput()
+    protected function createChildOutput(): OutputInterface
     {
         return new NullOutput();
     }
 
-    /**
-     * @param InputInterface $input
-     * @return string
-     */
-    protected function getPidFilename(InputInterface $input)
+    protected function getPidFilename(InputInterface $input): string
     {
         // pid file check
         $pidFile = $input->getOption('pid-file');
         if ($pidFile === false) {
             // no file specified, generate our own name
             $baseDir = getcwd();
-            $name    = str_replace(' ', '-', strtolower($this->getName()));
+            $name = str_replace(' ', '-', strtolower($this->getName()));
             $pidFile = $baseDir . DIRECTORY_SEPARATOR . $name . '.pid';
         }
 

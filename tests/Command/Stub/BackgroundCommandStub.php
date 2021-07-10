@@ -1,6 +1,8 @@
 <?php
 
-require_once __DIR__ . '/ExecuteStubTrait.php';
+declare(strict_types=1);
+
+namespace Phlib\ConsoleProcess\Command\Stub;
 
 use Phlib\ConsoleProcess\Command\BackgroundCommand;
 
