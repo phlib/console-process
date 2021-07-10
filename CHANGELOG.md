@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+- Add specific support for PHP v8
 - Type declarations have been added to all method parameters and return types.
 ### Changed
 - `DaemonCommand::background()` no longer tries to return the result of the
