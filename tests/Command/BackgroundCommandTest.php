@@ -56,18 +56,18 @@ class BackgroundCommandTest extends TestCase
 
     public function testInstanceOfConsoleCommand(): void
     {
-        $this->assertInstanceOf(Command::class, $this->command);
+        static::assertInstanceOf(Command::class, $this->command);
     }
 
     public function testBaseCommandClassIsCalled(): void
     {
-        $this->assertSame($this->commandName, $this->command->getName());
+        static::assertSame($this->commandName, $this->command->getName());
     }
 
     public function testDefaultSignalCallbacksAreCreated(): void
     {
         $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
-        $pcntl_signal->expects($this->exactly(2))
+        $pcntl_signal->expects(static::exactly(2))
             ->withConsecutive([SIGTERM], [SIGINT]);
 
         $this->tester->execute([]);
