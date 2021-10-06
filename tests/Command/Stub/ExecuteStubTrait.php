@@ -9,14 +9,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 trait ExecuteStubTrait
 {
-    /**
-     * @var string|null
-     */
-    protected $executeValue = null;
+    protected string $executeValue;
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if ($this->executeValue !== null) {
+        if (isset($this->executeValue)) {
             $output->writeln($this->executeValue);
         }
         $this->shutdown();
