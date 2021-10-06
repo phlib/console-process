@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Annotate the `BackgroundCommand::shutdown()` method as final.
+  This will be marked final in a future major version.
 
 ## [2.0.0] - 2021-07-10
 ### Added

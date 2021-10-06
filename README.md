@@ -10,7 +10,7 @@ Console signal implementation using [PHPs Process control functions](http://php.
 
 There are 2 implementations.
 
-1. Background command. Allows a process to be interrupted using the signal handler.
+1. Background command. Repeatedly execute a command, until interrupted using the signal handler.
 2. Daemon command. Builds on the Background command to allow forking (detaching) the process.
 
 ## Install
@@ -24,10 +24,15 @@ $ composer require phlib/console-process
 ## Background Command
 ### Basic Usage
 
-The Background Command works in the same way as you're used to with the normal Symfony Command.
+The Background Command is implemented in the same way as you're used to with the
+normal Symfony Command, however it must allow for the `execute()` method to be
+called multiple times.
+There is a processing delay between each execution which can be customised.
 
 ```php
 <?php
+
+declare(strict_types=1);
 
 use Phlib\Console\Command\BackgroundCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,32 +40,61 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MyProcessCommand extends BackgroundCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('my:process')
             ->setDescription('My background process.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Doing important work!');
+        return 0;
     }
 }
 
 ```
 
-### Lifecycle Methods
+### Stopping execution
 
-The background command has one additional method, to the standard Symfony command methods, which gets called 
-when the process finishes. The method is ```onShutdown``` which takes a ```InputInterface``` and 
-an ```OutputInterface```. This can be used for any final cleanup for example.
+Typically, the command will continue execution until interrupted by a signal,
+e.g. a user pressing `Ctrl+C`.
+
+Alternatively, if an implementation has a finite task, for example deleting
+records in batches, it may need to terminate itself once the task is complete.
+This is done by calling `shutdown()`.
 
 ```php
 class MyProcessCommand extends BackgroundCommand
 {
     // ...
     
-    protected function onShutdown(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $countDeleted = $this->deleteBatchOfRecords();
+        if ($countDeleted === 0) {
+            $output->writeln('All done!');
+            $this->shutdown();
+        }
+        return 0;
+    }
+}
+```
+
+### Lifecycle Methods
+
+The background command has additional methods that get called when the process
+finishes, which can be used for any final cleanup.
+
+  * `onShutdown(InputInterface $input, OutputInterface $output): void`
+  * `onException(\Exception $e, InputInterface $input, OutputInterface $output): void`
+
+```php
+class MyProcessCommand extends BackgroundCommand
+{
+    // ...
+    
+    protected function onShutdown(InputInterface $input, OutputInterface $output): void
     {
         $output->writeln('onShutdown method called.');
     }
@@ -76,6 +110,8 @@ on the command name.
 
 ```php
 <?php
+
+declare(strict_types=1);
 
 use Phlib\Console\Command\DaemonCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -144,7 +180,7 @@ class MyProcessCommand extends DaemonCommand
 }
 ```
 
-## Command Line
+### Command Line
 
 ```bash
 # path/to/my/process start -d
@@ -158,10 +194,11 @@ class MyProcessCommand extends DaemonCommand
 # path/to/my/process stop
 ```
 
-###  Options
+####  Options
+
 |Name|Short|Type|Required|Default|Description|
 |----|----|-----|--------|-------|-----------|
-|action||Argument|yes||start, stop, status|
+|action| |Argument|yes| |start, stop, status|
 |daemonize|d|Option|no|no|Detaches the process|
 |pid-file|p|Option|no|auto|Name of the PID file to use. Not used if daemonize is not set.|
 

@@ -8,6 +8,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Background extends BackgroundCommand
 {
+    protected $processingDelay = 1000000; // 1s
+
     protected function configure(): void
     {
         $this->setName('background')
@@ -16,8 +18,7 @@ class Background extends BackgroundCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // do some work
-        sleep(1);
+        $output->writeln('Do some work');
         return 0;
     }
 

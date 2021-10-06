@@ -79,7 +79,8 @@ class BackgroundCommand extends Command
     }
 
     /**
-     * Tell the process to stop running at the next iteration.
+     * Allows the process to stop itself at the next iteration.
+     * @final This method is provided to stop the execution loop. MUST NOT be overridden.
      */
     protected function shutdown(): void
     {
