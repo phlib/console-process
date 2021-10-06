@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Background extends BackgroundCommand
 {
-    protected $processingDelay = 1000000; // 1s
+    protected int $processingDelay = 1000000; // 1s
 
     protected function configure(): void
     {

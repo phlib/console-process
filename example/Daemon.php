@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class Daemon extends DaemonCommand
 {
-    protected $processingDelay = 1000000; // 1s
+    protected int $processingDelay = 1000000; // 1s
 
     protected function configure(): void
     {

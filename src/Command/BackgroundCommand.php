@@ -14,20 +14,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class BackgroundCommand extends Command
 {
-    /**
-     * @var bool
-     */
-    protected $continue = true;
+    protected bool $continue = true;
 
-    /**
-     * @var array
-     */
-    private $signalCallbacks = [];
+    private array $signalCallbacks = [];
 
-    /**
-     * @var int
-     */
-    protected $processingDelay = 500000;
+    protected int $processingDelay = 500000; // μs,
 
     /**
      * @var callable

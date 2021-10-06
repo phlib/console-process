@@ -12,19 +12,13 @@ class DaemonCommandStub extends DaemonCommand
 {
     use ExecuteStubTrait;
 
-    /**
-     * @var string|null
-     */
-    protected $shutdownValue = null;
+    protected string $shutdownValue;
 
-    /**
-     * @var \Closure
-     */
-    protected $outputCallback;
+    protected \Closure $outputCallback;
 
     protected function onShutdown(InputInterface $input, OutputInterface $output): void
     {
-        if ($this->shutdownValue !== null) {
+        if (isset($this->shutdownValue)) {
             $output->writeln($this->shutdownValue);
         }
     }
