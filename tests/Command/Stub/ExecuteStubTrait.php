@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 trait ExecuteStubTrait
 {
-    protected string $executeValue;
+    private string $executeValue;
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

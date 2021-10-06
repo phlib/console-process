@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class BackgroundCommand extends Command
 {
-    protected bool $continue = true;
+    private bool $continue = true;
 
     private array $signalCallbacks = [];
 
@@ -44,6 +44,9 @@ class BackgroundCommand extends Command
         return $this;
     }
 
+    /**
+     * @internal This method is not part of the backward-compatibility promise.
+     */
     protected function background(InputInterface $input, OutputInterface $output): void
     {
         $this->registerSignals($output);
@@ -70,10 +73,10 @@ class BackgroundCommand extends Command
     }
 
     /**
-     * Allows the process to stop itself at the next iteration.
-     * @final This method is provided to stop the execution loop. MUST NOT be overridden.
+     * For processes with a finite task, this method can be used to stop itself before the next iteration.
+     * See README.
      */
-    protected function shutdown(): void
+    final protected function shutdown(): void
     {
         $this->continue = false;
     }
@@ -89,18 +92,17 @@ class BackgroundCommand extends Command
     /**
      * Causes the process to sleep for the number of microseconds as specifed by processing delay property.
      */
-    protected function sleep(): void
+    private function sleep(): void
     {
         usleep($this->processingDelay);
     }
 
-    protected function addSignalCallback(int $signal, callable $callback): self
+    private function addSignalCallback(int $signal, callable $callback): void
     {
         if (!array_key_exists($signal, $this->signalCallbacks)) {
             $this->signalCallbacks[$signal] = [];
         }
         $this->signalCallbacks[$signal][] = $callback;
-        return $this;
     }
 
     /**

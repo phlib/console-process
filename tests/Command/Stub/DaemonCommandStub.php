@@ -12,9 +12,9 @@ class DaemonCommandStub extends DaemonCommand
 {
     use ExecuteStubTrait;
 
-    protected string $shutdownValue;
+    private string $shutdownValue;
 
-    protected \Closure $outputCallback;
+    private \Closure $outputCallback;
 
     protected function onShutdown(InputInterface $input, OutputInterface $output): void
     {
