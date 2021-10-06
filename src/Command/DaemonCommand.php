@@ -22,7 +22,7 @@ class DaemonCommand extends BackgroundCommand
         $this->configureDaemon();
     }
 
-    protected function configureDaemon(): void
+    private function configureDaemon(): void
     {
         $this->addArgument('action', InputArgument::REQUIRED, 'Start, stop or status.')
             ->addOption('pid-file', 'p', InputOption::VALUE_REQUIRED, 'PID file location.', false)
@@ -41,7 +41,7 @@ class DaemonCommand extends BackgroundCommand
     {
     }
 
-    protected function background(InputInterface $input, OutputInterface $output): void
+    final protected function background(InputInterface $input, OutputInterface $output): void
     {
         $action = strtolower($input->getArgument('action'));
         if (!in_array($action, ['start', 'stop', 'status'], true)) {
@@ -175,12 +175,12 @@ class DaemonCommand extends BackgroundCommand
         }
     }
 
-    protected function recreateInput(InputInterface $input): InputInterface
+    private function recreateInput(InputInterface $input): InputInterface
     {
         return clone $input;
     }
 
-    protected function recreateOutput(OutputInterface $output): OutputInterface
+    private function recreateOutput(OutputInterface $output): OutputInterface
     {
         $verbosityLevel = $output->getVerbosity();
         $newInstance = $this->createChildOutput();
@@ -193,7 +193,7 @@ class DaemonCommand extends BackgroundCommand
         return new NullOutput();
     }
 
-    protected function getPidFilename(InputInterface $input): string
+    private function getPidFilename(InputInterface $input): string
     {
         // pid file check
         $pidFile = $input->getOption('pid-file');
