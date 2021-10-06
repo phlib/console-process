@@ -46,14 +46,6 @@ class BackgroundCommandTest extends TestCase
         $this->tester = new CommandTester($this->command);
     }
 
-    protected function tearDown(): void
-    {
-        $this->tester = null;
-        $this->command = null;
-        $this->application = null;
-        parent::tearDown();
-    }
-
     public function testInstanceOfConsoleCommand(): void
     {
         static::assertInstanceOf(Command::class, $this->command);
