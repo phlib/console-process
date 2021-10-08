@@ -91,16 +91,11 @@ class DaemonCommand extends BackgroundCommand
         try {
             $output->writeln('Daemon executing main process.');
             parent::background($input, $output);
-        } catch (\Exception $e) {
+        } finally {
+            $output->writeln('Daemon process shutting down.');
             if ($pidFile !== null && file_exists($pidFile)) {
                 unlink($pidFile);
             }
-            throw $e;
-        }
-
-        $output->writeln('Daemon process shutting down.');
-        if ($pidFile !== null && file_exists($pidFile)) {
-            unlink($pidFile);
         }
     }
 
