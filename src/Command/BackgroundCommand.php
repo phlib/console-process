@@ -47,7 +47,7 @@ class BackgroundCommand extends Command
     /**
      * @internal This method is not part of the backward-compatibility promise.
      */
-    protected function background(InputInterface $input, OutputInterface $output): void
+    protected function background(InputInterface $input, OutputInterface $output): int
     {
         $this->registerSignals($output);
         if ($output->isVerbose()) {
@@ -70,6 +70,8 @@ class BackgroundCommand extends Command
             $output->writeln('Background process shutting down.');
         }
         $this->onShutdown($input, $output);
+
+        return 0;
     }
 
     /**
