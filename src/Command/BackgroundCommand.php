@@ -54,9 +54,14 @@ class BackgroundCommand extends Command
             $output->writeln('Background PCNTL Signals registered.');
         }
 
+        $exitCode = 0;
         while ($this->continue) {
             try {
-                call_user_func($this->backgroundExecute, $input, $output);
+                $exitCode = call_user_func($this->backgroundExecute, $input, $output);
+                if ($exitCode > 0) {
+                    $this->shutdown();
+                    break;
+                }
                 pcntl_signal_dispatch();
                 $this->sleep();
             } catch (\Exception $e) {
@@ -71,7 +76,7 @@ class BackgroundCommand extends Command
         }
         $this->onShutdown($input, $output);
 
-        return 0;
+        return $exitCode;
     }
 
     /**

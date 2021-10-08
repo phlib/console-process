@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - Type declarations have been added to class properties.
+- Exit value returned from implementation's `execute()` method is returned to
+  the console. A non-zero value will stop the process iteration.
 ### Changed
 - **BC break**: Reduce visibility of internal methods and properties. These
   members are not part of the public API. No impact to standard use of this
