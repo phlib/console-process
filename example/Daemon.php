@@ -9,6 +9,8 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class Daemon extends DaemonCommand
 {
+    protected $processingDelay = 1000000; // 1s
+
     protected function configure(): void
     {
         $this->setName('daemon')
@@ -32,8 +34,7 @@ class Daemon extends DaemonCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // do some work
-        sleep(1);
+        $output->writeln('Do some work');
         return 0;
     }
 
