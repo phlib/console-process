@@ -31,9 +31,6 @@ class DaemonCommandTest extends TestCase
 
         $this->command = $this->application->find($this->commandName);
         $this->tester = new CommandTester($this->command);
-        $this->command->setOutputCallback(function () {
-            return $this->tester->getOutput();
-        });
     }
 
     public function testInstanceOfConsoleCommand(): void
@@ -102,6 +99,11 @@ class DaemonCommandTest extends TestCase
     {
         $expected = 'execute called';
         $this->command->setExecuteOutput($expected);
+
+        $this->command->setOutputCallback(function () {
+            return $this->tester->getOutput();
+        });
+
         $this->setupStartFunctions(null);
         $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
         $pcntl_signal->expects(static::any())
@@ -119,6 +121,11 @@ class DaemonCommandTest extends TestCase
     {
         $expected = 'onShutdown called';
         $this->command->setShutdownOutput($expected);
+
+        $this->command->setOutputCallback(function () {
+            return $this->tester->getOutput();
+        });
+
         $this->setupStartFunctions(null);
         $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
         $pcntl_signal->expects(static::any())
@@ -130,6 +137,97 @@ class DaemonCommandTest extends TestCase
             '-d' => true,
         ]);
         static::assertStringContainsString("{$expected}\n", $this->tester->getDisplay());
+    }
+
+    public function testChildWriteToLogPath(): void
+    {
+        $expected = 'execute called';
+        $logPath = $this->getTestTempFilename(__FUNCTION__, 'log');
+
+        $this->command->setExecuteOutput($expected);
+
+        $this->setupStartFunctions(null);
+        $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
+        $pcntl_signal->expects(static::any())
+            ->willReturn(true);
+
+        $this->tester->execute([
+            'action' => 'start',
+            '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
+            '-d' => true,
+            '-o' => $logPath,
+        ]);
+
+        $actual = file_get_contents($logPath);
+        static::assertStringContainsString("{$expected}\n", $actual);
+
+        unlink($logPath);
+    }
+
+    public function testChildLogPathErrorDir(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('is not a file');
+
+        $logPath = __DIR__ . '/';
+
+        $this->setupStartFunctions(null);
+
+        $this->tester->execute([
+            'action' => 'start',
+            '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
+            '-d' => true,
+            '-o' => $logPath,
+        ]);
+    }
+
+    public function testChildLogPathErrorFileNotWritable(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('is not writable');
+
+        // Create a temp file and set not writable
+        $logPath = $this->getTestTempFilename(__FUNCTION__, 'log');
+        touch($logPath);
+        chmod($logPath, 0400);
+
+        $this->setupStartFunctions(null);
+
+        try {
+            $this->tester->execute([
+                'action' => 'start',
+                '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
+                '-d' => true,
+                '-o' => $logPath,
+            ]);
+        } finally {
+            unlink($logPath);
+        }
+    }
+
+    public function testChildLogPathErrorDirNotWritable(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot create child log file');
+
+        // Create a temp dir and set not writable
+        $logDir = $this->getTestTempFilename(__FUNCTION__, '');
+        mkdir($logDir);
+        chmod($logDir, 0500);
+        $logPath = $logDir . '/cannot-write-this.log';
+
+        $this->setupStartFunctions(null);
+
+        try {
+            $this->tester->execute([
+                'action' => 'start',
+                '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
+                '-d' => true,
+                '-o' => $logPath,
+            ]);
+        } finally {
+            rmdir($logDir);
+        }
     }
 
     public function testStoppingSuccessfully(): void
@@ -177,6 +275,7 @@ class DaemonCommandTest extends TestCase
 
     private function getTestTempFilename(string $functionName, string $fileExtension): string
     {
-        return __DIR__ . "/{$functionName}-" . uniqid() . '.' . $fileExtension;
+        return __DIR__ . "/{$functionName}-" . uniqid() .
+            ($fileExtension ? '.' . $fileExtension : '');
     }
 }

@@ -164,9 +164,10 @@ class MyProcessCommand extends DaemonCommand
 
 ### Output
 
-Once a daemon process is detached, the original output is also lost. The daemon command class provides a 
-protected method to specify a new output. If this method isn't overriden, then by default, the output is a
-```NullOutput``` Symfony object. The following example demonstrates overriding the method.
+Once a daemon process is detached, the original output is also lost.
+The `--child-log | -o` option can be used to specify a filename to write output.
+Alternatively, the `createChildOutput()` method can be overridden to return a
+new output instance. For example:
 
 ```php
 use Symfony\Component\Console\Output\StreamOutput;
@@ -177,7 +178,7 @@ class MyProcessCommand extends DaemonCommand
     
     protected function createChildOutput()
     {
-        return new StreamOutput(fopen(getcwd() . '/my-daemon.log', 'a'));
+        return new MyOutputToLoggerClass();
     }
 }
 ```
@@ -230,6 +231,7 @@ class MyProcessCommand extends DaemonCommand
 |action| |Argument|yes| |start, stop, status|
 |daemonize|d|Option|no|no|Detaches the process|
 |pid-file|p|Option|no|auto|Name of the PID file to use. Not used if daemonize is not set.|
+|child-log|o|Option|no|no|Name of the file to save child output. Not used if daemonize is not set.|
 
 ## License
 

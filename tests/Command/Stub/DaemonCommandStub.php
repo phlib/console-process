@@ -29,9 +29,13 @@ class DaemonCommandStub extends DaemonCommand
         return $this;
     }
 
-    protected function createChildOutput(): OutputInterface
+    protected function createChildOutput(?string $childLogFilename): OutputInterface
     {
-        return call_user_func($this->outputCallback);
+        if (isset($this->outputCallback)) {
+            return ($this->outputCallback)();
+        }
+
+        return parent::createChildOutput($childLogFilename);
     }
 
     public function setOutputCallback(\Closure $callback): self

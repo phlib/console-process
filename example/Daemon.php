@@ -42,9 +42,4 @@ class Daemon extends DaemonCommand
     {
         $output->writeln('onShutdown method called.');
     }
-
-    protected function createChildOutput(): OutputInterface
-    {
-        return new StreamOutput(fopen(getcwd() . '/daemon.log', 'a'));
-    }
 }

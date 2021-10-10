@@ -9,11 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Type declarations have been added to class properties.
 - Exit value returned from implementation's `execute()` method is returned to
   the console. A non-zero value will stop the process iteration.
+- Native input option for `DaemonCommand` to set the child log output filename.
+  This should remove a common need to override `DaemonCommand::createChildOutput()`.
 ### Changed
 - **BC break**: Reduce visibility of internal methods and properties. These
   members are not part of the public API. No impact to standard use of this
   package. If an implementation has a use case which needs to override these
   members, please submit a pull request explaining the change.
+- **BC break**: New parameter added for `DaemonCommand::createChildOutput()`,
+  which will be a BC break for implementations that override that method.
 ### Removed
 - **BC break**: Removed support for PHP v7.3 as it is no longer
   [actively supported](https://php.net/supported-versions.php) by the PHP project.
