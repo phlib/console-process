@@ -173,8 +173,8 @@ class DaemonCommandTest extends TestCase
         $is_writable = $this->getFunctionMock(__NAMESPACE__, 'unlink');
         $is_writable->expects(static::any())->willReturn(true);
 
-        $is_writable = $this->getFunctionMock(__NAMESPACE__, 'sleep');
-        $is_writable->expects(static::any())->willReturn(true);
+        $usleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
+        $usleep->expects(static::any())->willReturn(true);
     }
 
     protected function setupStopFunctions(

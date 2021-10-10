@@ -57,6 +57,11 @@ class BackgroundCommandTest extends TestCase
         $pcntl_signal->expects(static::exactly(2))
             ->withConsecutive([SIGTERM], [SIGINT]);
 
+        // Remove the delay between iterations
+        $sleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
+        $sleep->expects(static::once())
+            ->willReturn(true);
+
         $this->tester->execute([]);
     }
 
@@ -88,8 +93,8 @@ class BackgroundCommandTest extends TestCase
         $dispatch->expects(static::never());
 
         // Exit before calling sleep
-        $sleep = $this->getFunctionMock(__NAMESPACE__, 'sleep');
-        $sleep->expects(static::never());
+        $usleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
+        $usleep->expects(static::never());
 
         $actual = $this->tester->execute([]);
 
