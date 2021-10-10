@@ -77,7 +77,7 @@ class DaemonCommandTest extends TestCase
 
         $this->tester->execute([
             'action' => 'start',
-            '-p' => '/path/to/my.pid',
+            '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
             '-d' => true,
         ]);
     }
@@ -93,7 +93,7 @@ class DaemonCommandTest extends TestCase
 
         $this->tester->execute([
             'action' => 'start',
-            '-p' => '/path/to/my.pid',
+            '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
             '-d' => true,
         ]);
     }
@@ -109,7 +109,7 @@ class DaemonCommandTest extends TestCase
 
         $this->tester->execute([
             'action' => 'start',
-            '-p' => '/path/to/my.pid',
+            '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
             '-d' => true,
         ]);
         static::assertStringContainsString("{$expected}\n", $this->tester->getDisplay());
@@ -126,7 +126,7 @@ class DaemonCommandTest extends TestCase
 
         $this->tester->execute([
             'action' => 'start',
-            '-p' => '/path/to/my.pid',
+            '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
             '-d' => true,
         ]);
         static::assertStringContainsString("{$expected}\n", $this->tester->getDisplay());
@@ -134,18 +134,33 @@ class DaemonCommandTest extends TestCase
 
     public function testStoppingSuccessfully(): void
     {
-        $expected = 231;
-        $this->setupStopFunctions($expected);
+        $expectedPid = rand(1, 99999);
+        $pidFile = $this->getTestTempFilename(__FUNCTION__, 'pid');
+
+        // Set the pidFile to have the expected PID which should be passed to `posix_kill()`
+        file_put_contents($pidFile, $expectedPid);
 
         $posix_kill = $this->getFunctionMock(__NAMESPACE__, 'posix_kill');
-        $posix_kill->expects(static::atLeast(2))
-            ->with($expected)
-            ->willReturn(false);
+        $posix_kill->expects(static::exactly(2))
+            ->withConsecutive(
+                [$expectedPid, SIGTERM],
+                [$expectedPid, 0],
+            )
+            ->willReturnOnConsecutiveCalls(
+                true,
+                false,
+            );
+
+        // Remove the delay used to wait for a real process to exit
+        $usleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
+        $usleep->expects(static::any())->willReturn(true);
 
         $this->tester->execute([
             'action' => 'stop',
-            '-p' => '/path/to/my.pid',
+            '-p' => $pidFile,
         ]);
+
+        unlink($pidFile);
     }
 
     private function setupStartFunctions(?int $fork, int $setsid = 0): void
@@ -156,37 +171,12 @@ class DaemonCommandTest extends TestCase
         $posix_setsid = $this->getFunctionMock(__NAMESPACE__, 'posix_setsid');
         $posix_setsid->expects(static::any())->willReturn($setsid);
 
-        $file_exists = $this->getFunctionMock(__NAMESPACE__, 'file_exists');
-        $file_exists->expects(static::any())->willReturn(false);
-
-        $is_writable = $this->getFunctionMock(__NAMESPACE__, 'is_writable');
-        $is_writable->expects(static::any())->willReturn(true);
-
-        $is_writable = $this->getFunctionMock(__NAMESPACE__, 'file_put_contents');
-        $is_writable->expects(static::any())->willReturn(true);
-
-        $is_writable = $this->getFunctionMock(__NAMESPACE__, 'unlink');
-        $is_writable->expects(static::any())->willReturn(true);
-
         $usleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
         $usleep->expects(static::any())->willReturn(true);
     }
 
-    private function setupStopFunctions(int $pid): void
+    private function getTestTempFilename(string $functionName, string $fileExtension): string
     {
-        $file_exists = $this->getFunctionMock(__NAMESPACE__, 'file_exists');
-        $file_exists->expects(static::any())->willReturn(true);
-
-        $fopen = $this->getFunctionMock(__NAMESPACE__, 'fopen');
-        $fopen->expects(static::any())->willReturn(true);
-
-        $fgets = $this->getFunctionMock(__NAMESPACE__, 'fgets');
-        $fgets->expects(static::any())->willReturn($pid);
-
-        $fclose = $this->getFunctionMock(__NAMESPACE__, 'fclose');
-        $fclose->expects(static::any())->willReturn(true);
-
-        $usleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
-        $usleep->expects(static::any())->willReturn(true);
+        return __DIR__ . "/{$functionName}-" . uniqid() . '.' . $fileExtension;
     }
 }
