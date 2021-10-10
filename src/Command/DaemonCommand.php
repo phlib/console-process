@@ -41,17 +41,24 @@ class DaemonCommand extends BackgroundCommand
     {
     }
 
-    final protected function background(InputInterface $input, OutputInterface $output): void
+    final protected function background(InputInterface $input, OutputInterface $output): int
     {
         $action = strtolower($input->getArgument('action'));
-        if (!in_array($action, ['start', 'stop', 'status'], true)) {
-            throw new \InvalidArgumentException("Provided action is invalid, expecting 'start', 'stop' or 'status'.");
+        switch ($action) {
+            case 'start':
+                return $this->start($input, $output);
+            case 'stop':
+                return $this->stop($input, $output);
+            case 'status':
+                return $this->status($input, $output);
+            default:
+                throw new \InvalidArgumentException(
+                    "Provided action is invalid, expecting 'start', 'stop' or 'status'."
+                );
         }
-
-        $this->{$action}($input, $output);
     }
 
-    private function start(InputInterface $input, OutputInterface $output): void
+    private function start(InputInterface $input, OutputInterface $output): int
     {
         $pidFile = null;
         if ($input->getOption('daemonize')) {
@@ -71,7 +78,7 @@ class DaemonCommand extends BackgroundCommand
                     $output->writeln('Parent process completing.');
                 }
                 $this->onAfterDaemonizeParent($input, $output);
-                return;
+                return 0;
             }
 
             // children shouldn't hold onto parents input/output
@@ -90,17 +97,12 @@ class DaemonCommand extends BackgroundCommand
 
         try {
             $output->writeln('Daemon executing main process.');
-            parent::background($input, $output);
-        } catch (\Exception $e) {
+            return parent::background($input, $output);
+        } finally {
+            $output->writeln('Daemon process shutting down.');
             if ($pidFile !== null && file_exists($pidFile)) {
                 unlink($pidFile);
             }
-            throw $e;
-        }
-
-        $output->writeln('Daemon process shutting down.');
-        if ($pidFile !== null && file_exists($pidFile)) {
-            unlink($pidFile);
         }
     }
 
@@ -130,7 +132,7 @@ class DaemonCommand extends BackgroundCommand
         return true;
     }
 
-    private function stop(InputInterface $input, OutputInterface $output): void
+    private function stop(InputInterface $input, OutputInterface $output): int
     {
         $pidFile = $this->getPidFilename($input);
 
@@ -149,14 +151,16 @@ class DaemonCommand extends BackgroundCommand
                 usleep(500000);
             } while (posix_kill($pid, 0));
         }
+
+        return 0;
     }
 
-    private function status(InputInterface $input, OutputInterface $output): void
+    private function status(InputInterface $input, OutputInterface $output): int
     {
         $pidFile = $this->getPidFilename($input);
         if (!file_exists($pidFile)) {
             $output->writeln('Not running');
-            return;
+            return 0;
         }
 
         $fileHandle = @fopen($pidFile, 'r');
@@ -173,6 +177,8 @@ class DaemonCommand extends BackgroundCommand
         } else {
             $output->writeln('Not running');
         }
+
+        return 0;
     }
 
     private function recreateInput(InputInterface $input): InputInterface

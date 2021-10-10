@@ -57,8 +57,12 @@ class MyProcessCommand extends BackgroundCommand
 
 ### Stopping execution
 
+#### Normal usage
+
 Typically, the command will continue execution until interrupted by a signal,
 e.g. a user pressing `Ctrl+C`.
+
+#### Self-termination
 
 Alternatively, if an implementation has a finite task, for example deleting
 records in batches, it may need to terminate itself once the task is complete.
@@ -76,6 +80,31 @@ class MyProcessCommand extends BackgroundCommand
             $output->writeln('All done!');
             $this->shutdown();
         }
+        return 0;
+    }
+}
+```
+
+#### Non-zero exit
+
+If an execution returns a non-zero exit code, iteration will be stopped and the
+exit code will be passed back to the console, as with a normal Symfony Command.
+
+```php
+class MyProcessCommand extends BackgroundCommand
+{
+    // ...
+    
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $isInputValid = $this->someValidationChecks($input);
+        if ($isInputValid === false) {
+            $output->writeln('Message explaining invalid input');
+            return 1;
+        }
+        
+        // do some work
+        
         return 0;
     }
 }

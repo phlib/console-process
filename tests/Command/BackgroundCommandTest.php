@@ -22,6 +22,14 @@ class BackgroundCommandTest extends TestCase
 
     protected CommandTester $tester;
 
+    public static function setUpBeforeClass(): void
+    {
+        static::defineFunctionMock(__NAMESPACE__, 'pcntl_signal_dispatch');
+        static::defineFunctionMock(__NAMESPACE__, 'usleep');
+
+        parent::setUpBeforeClass();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -50,5 +58,42 @@ class BackgroundCommandTest extends TestCase
             ->withConsecutive([SIGTERM], [SIGINT]);
 
         $this->tester->execute([]);
+    }
+
+    public function testShutdownOnNextIteration(): void
+    {
+        // Signal dispatch will be called
+        $dispatch = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal_dispatch');
+        $dispatch->expects(static::once())
+            ->willReturn(true);
+
+        // Sleep between executions
+        $sleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
+        $sleep->expects(static::once())
+            ->willReturn(true);
+
+        $this->tester->execute([]);
+
+        static::assertSame(1, $this->command->getExecuteCount());
+    }
+
+    public function testExitCodeShutdown(): void
+    {
+        $exitCode = rand(1, 50);
+
+        $this->command->setExitCode($exitCode);
+
+        // Exit before processing signals
+        $dispatch = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal_dispatch');
+        $dispatch->expects(static::never());
+
+        // Exit before calling sleep
+        $sleep = $this->getFunctionMock(__NAMESPACE__, 'sleep');
+        $sleep->expects(static::never());
+
+        $actual = $this->tester->execute([]);
+
+        static::assertSame($exitCode, $actual);
+        static::assertSame(1, $this->command->getExecuteCount());
     }
 }
