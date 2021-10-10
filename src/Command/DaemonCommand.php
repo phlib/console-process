@@ -92,7 +92,7 @@ class DaemonCommand extends BackgroundCommand
             if (!$written) {
                 throw new \RuntimeException(sprintf("Failed to write PID file '%s'", $pidFile));
             }
-            $output->writeln("PID file written to '${pidFile}'.");
+            $output->writeln("PID file written to '{$pidFile}'.");
         }
 
         try {
@@ -173,7 +173,7 @@ class DaemonCommand extends BackgroundCommand
 
         $running = posix_kill($pid, 0);
         if ($running) {
-            $output->writeln("Running (PID: ${pid})");
+            $output->writeln("Running (PID: {$pid})");
         } else {
             $output->writeln('Not running');
         }

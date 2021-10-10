@@ -112,7 +112,7 @@ class DaemonCommandTest extends TestCase
             '-p' => '/path/to/my.pid',
             '-d' => true,
         ]);
-        static::assertStringContainsString("${expected}\n", $this->tester->getDisplay());
+        static::assertStringContainsString("{$expected}\n", $this->tester->getDisplay());
     }
 
     public function testChildCallsOnShutdown(): void
@@ -129,7 +129,7 @@ class DaemonCommandTest extends TestCase
             '-p' => '/path/to/my.pid',
             '-d' => true,
         ]);
-        static::assertStringContainsString("${expected}\n", $this->tester->getDisplay());
+        static::assertStringContainsString("{$expected}\n", $this->tester->getDisplay());
     }
 
     public function testStoppingSuccessfully(): void

@@ -121,7 +121,7 @@ class BackgroundCommand extends Command
             foreach ($callbacks as $callback) {
                 pcntl_signal($signal, function () use ($signal, $output, $callback) {
                     if ($output->isVerbose()) {
-                        $output->writeln("Received signal '${signal}', calling registered callback.");
+                        $output->writeln("Received signal '{$signal}', calling registered callback.");
                     }
                     return $callback();
                 });
