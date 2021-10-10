@@ -148,13 +148,8 @@ class DaemonCommandTest extends TestCase
         ]);
     }
 
-    protected function setupStartFunctions(
-        ?int $fork,
-        int $setsid = 0,
-        bool $fexists = false,
-        bool $writeable = true,
-        bool $putContents = true
-    ): void {
+    private function setupStartFunctions(?int $fork, int $setsid = 0): void
+    {
         $pcntl_fork = $this->getFunctionMock(__NAMESPACE__, 'pcntl_fork');
         $pcntl_fork->expects(static::any())->willReturn($fork);
 
@@ -162,13 +157,13 @@ class DaemonCommandTest extends TestCase
         $posix_setsid->expects(static::any())->willReturn($setsid);
 
         $file_exists = $this->getFunctionMock(__NAMESPACE__, 'file_exists');
-        $file_exists->expects(static::any())->willReturn($fexists);
+        $file_exists->expects(static::any())->willReturn(false);
 
         $is_writable = $this->getFunctionMock(__NAMESPACE__, 'is_writable');
-        $is_writable->expects(static::any())->willReturn($writeable);
+        $is_writable->expects(static::any())->willReturn(true);
 
         $is_writable = $this->getFunctionMock(__NAMESPACE__, 'file_put_contents');
-        $is_writable->expects(static::any())->willReturn($putContents);
+        $is_writable->expects(static::any())->willReturn(true);
 
         $is_writable = $this->getFunctionMock(__NAMESPACE__, 'unlink');
         $is_writable->expects(static::any())->willReturn(true);
@@ -177,28 +172,19 @@ class DaemonCommandTest extends TestCase
         $usleep->expects(static::any())->willReturn(true);
     }
 
-    protected function setupStopFunctions(
-        int $pid,
-        bool $fexists = true,
-        bool $opened = true,
-        bool $withPosixKill = false
-    ): void {
+    private function setupStopFunctions(int $pid): void
+    {
         $file_exists = $this->getFunctionMock(__NAMESPACE__, 'file_exists');
-        $file_exists->expects(static::any())->willReturn($fexists);
+        $file_exists->expects(static::any())->willReturn(true);
 
         $fopen = $this->getFunctionMock(__NAMESPACE__, 'fopen');
-        $fopen->expects(static::any())->willReturn($opened);
+        $fopen->expects(static::any())->willReturn(true);
 
         $fgets = $this->getFunctionMock(__NAMESPACE__, 'fgets');
         $fgets->expects(static::any())->willReturn($pid);
 
         $fclose = $this->getFunctionMock(__NAMESPACE__, 'fclose');
         $fclose->expects(static::any())->willReturn(true);
-
-        if ($withPosixKill) {
-            $posix_kill = $this->getFunctionMock(__NAMESPACE__, 'posix_kill');
-            $posix_kill->expects(static::any())->willReturn(false);
-        }
 
         $usleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
         $usleep->expects(static::any())->willReturn(true);
