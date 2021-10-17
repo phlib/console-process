@@ -74,9 +74,7 @@ class DaemonCommand extends BackgroundCommand
             $this->onBeforeDaemonize($input, $output);
             $isChild = $this->daemonize();
             if (!$isChild) {
-                if ($output->isVerbose()) {
-                    $output->writeln('Parent process completing.');
-                }
+                $output->writeln('Parent process completing.', OutputInterface::VERBOSITY_VERBOSE);
                 $this->onAfterDaemonizeParent($input, $output);
                 return 0;
             }

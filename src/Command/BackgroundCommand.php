@@ -50,9 +50,7 @@ class BackgroundCommand extends Command
     protected function background(InputInterface $input, OutputInterface $output): int
     {
         $this->registerSignals($output);
-        if ($output->isVerbose()) {
-            $output->writeln('Background PCNTL Signals registered.');
-        }
+        $output->writeln('Background PCNTL Signals registered.', OutputInterface::VERBOSITY_VERBOSE);
 
         $exitCode = 0;
         while ($this->continue) {
@@ -71,9 +69,7 @@ class BackgroundCommand extends Command
             }
         }
 
-        if ($output->isVerbose()) {
-            $output->writeln('Background process shutting down.');
-        }
+        $output->writeln('Background process shutting down.', OutputInterface::VERBOSITY_VERBOSE);
         $this->onShutdown($input, $output);
 
         return $exitCode;
@@ -120,9 +116,10 @@ class BackgroundCommand extends Command
         foreach ($this->signalCallbacks as $signal => $callbacks) {
             foreach ($callbacks as $callback) {
                 pcntl_signal($signal, function () use ($signal, $output, $callback) {
-                    if ($output->isVerbose()) {
-                        $output->writeln("Received signal '{$signal}', calling registered callback.");
-                    }
+                    $output->writeln(
+                        "Received signal '{$signal}', calling registered callback.",
+                        OutputInterface::VERBOSITY_VERBOSE
+                    );
                     return $callback();
                 });
             }
