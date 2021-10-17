@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 
 /**
  * Class DaemonCommand
@@ -26,7 +27,13 @@ class DaemonCommand extends BackgroundCommand
     {
         $this->addArgument('action', InputArgument::REQUIRED, 'Start, stop or status.')
             ->addOption('pid-file', 'p', InputOption::VALUE_REQUIRED, 'PID file location.', false)
-            ->addOption('daemonize', 'd', InputOption::VALUE_NONE, 'Make the process run in the background and detach.');
+            ->addOption('daemonize', 'd', InputOption::VALUE_NONE, 'Make the process run in the background and detach.')
+            ->addOption(
+                'child-log',
+                'o',
+                InputOption::VALUE_REQUIRED,
+                'File location to log child output, when using <info>--daemonize</info>',
+            );
     }
 
     protected function onBeforeDaemonize(InputInterface $input, OutputInterface $output): void
@@ -80,8 +87,9 @@ class DaemonCommand extends BackgroundCommand
             }
 
             // children shouldn't hold onto parents input/output
+            $childLogFilename = $input->getOption('child-log');
             $input = $this->recreateInput($input);
-            $output = $this->recreateOutput($output);
+            $output = $this->recreateOutput($output, $childLogFilename);
 
             $output->writeln('Child process forked.');
             $this->onAfterDaemonizeChild($input, $output);
@@ -184,17 +192,32 @@ class DaemonCommand extends BackgroundCommand
         return clone $input;
     }
 
-    private function recreateOutput(OutputInterface $output): OutputInterface
+    private function recreateOutput(OutputInterface $output, ?string $childLogFilename): OutputInterface
     {
         $verbosityLevel = $output->getVerbosity();
-        $newInstance = $this->createChildOutput();
+        $newInstance = $this->createChildOutput($childLogFilename);
         $newInstance->setVerbosity($verbosityLevel);
         return $newInstance;
     }
 
-    protected function createChildOutput(): OutputInterface
+    protected function createChildOutput(?string $childLogFilename): OutputInterface
     {
-        return new NullOutput();
+        if (empty($childLogFilename)) {
+            return new NullOutput();
+        }
+
+        if (file_exists($childLogFilename)) {
+            if (!is_file($childLogFilename)) {
+                throw new \InvalidArgumentException(sprintf("Child log file '%s' is not a file.", $childLogFilename));
+            }
+            if (!is_writable($childLogFilename)) {
+                throw new \InvalidArgumentException(sprintf("Child log file '%s' is not writable.", $childLogFilename));
+            }
+        } elseif (!is_writable(dirname($childLogFilename))) {
+            throw new \InvalidArgumentException(sprintf("Cannot create child log file '%s'.", $childLogFilename));
+        }
+
+        return new StreamOutput(fopen($childLogFilename, 'a'));
     }
 
     private function getPidFilename(InputInterface $input): string

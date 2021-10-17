@@ -31,9 +31,6 @@ class DaemonCommandTest extends TestCase
 
         $this->command = $this->application->find($this->commandName);
         $this->tester = new CommandTester($this->command);
-        $this->command->setOutputCallback(function () {
-            return $this->tester->getOutput();
-        });
     }
 
     public function testInstanceOfConsoleCommand(): void
@@ -77,7 +74,7 @@ class DaemonCommandTest extends TestCase
 
         $this->tester->execute([
             'action' => 'start',
-            '-p' => '/path/to/my.pid',
+            '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
             '-d' => true,
         ]);
     }
@@ -93,7 +90,7 @@ class DaemonCommandTest extends TestCase
 
         $this->tester->execute([
             'action' => 'start',
-            '-p' => '/path/to/my.pid',
+            '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
             '-d' => true,
         ]);
     }
@@ -102,6 +99,11 @@ class DaemonCommandTest extends TestCase
     {
         $expected = 'execute called';
         $this->command->setExecuteOutput($expected);
+
+        $this->command->setOutputCallback(function () {
+            return $this->tester->getOutput();
+        });
+
         $this->setupStartFunctions(null);
         $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
         $pcntl_signal->expects(static::any())
@@ -109,7 +111,7 @@ class DaemonCommandTest extends TestCase
 
         $this->tester->execute([
             'action' => 'start',
-            '-p' => '/path/to/my.pid',
+            '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
             '-d' => true,
         ]);
         static::assertStringContainsString("{$expected}\n", $this->tester->getDisplay());
@@ -119,6 +121,11 @@ class DaemonCommandTest extends TestCase
     {
         $expected = 'onShutdown called';
         $this->command->setShutdownOutput($expected);
+
+        $this->command->setOutputCallback(function () {
+            return $this->tester->getOutput();
+        });
+
         $this->setupStartFunctions(null);
         $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
         $pcntl_signal->expects(static::any())
@@ -126,81 +133,149 @@ class DaemonCommandTest extends TestCase
 
         $this->tester->execute([
             'action' => 'start',
-            '-p' => '/path/to/my.pid',
+            '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
             '-d' => true,
         ]);
         static::assertStringContainsString("{$expected}\n", $this->tester->getDisplay());
     }
 
-    public function testStoppingSuccessfully(): void
+    public function testChildWriteToLogPath(): void
     {
-        $expected = 231;
-        $this->setupStopFunctions($expected);
+        $expected = 'execute called';
+        $logPath = $this->getTestTempFilename(__FUNCTION__, 'log');
 
-        $posix_kill = $this->getFunctionMock(__NAMESPACE__, 'posix_kill');
-        $posix_kill->expects(static::atLeast(2))
-            ->with($expected)
-            ->willReturn(false);
+        $this->command->setExecuteOutput($expected);
+
+        $this->setupStartFunctions(null);
+        $pcntl_signal = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal');
+        $pcntl_signal->expects(static::any())
+            ->willReturn(true);
 
         $this->tester->execute([
-            'action' => 'stop',
-            '-p' => '/path/to/my.pid',
+            'action' => 'start',
+            '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
+            '-d' => true,
+            '-o' => $logPath,
+        ]);
+
+        $actual = file_get_contents($logPath);
+        static::assertStringContainsString("{$expected}\n", $actual);
+
+        unlink($logPath);
+    }
+
+    public function testChildLogPathErrorDir(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('is not a file');
+
+        $logPath = __DIR__ . '/';
+
+        $this->setupStartFunctions(null);
+
+        $this->tester->execute([
+            'action' => 'start',
+            '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
+            '-d' => true,
+            '-o' => $logPath,
         ]);
     }
 
-    protected function setupStartFunctions(
-        ?int $fork,
-        int $setsid = 0,
-        bool $fexists = false,
-        bool $writeable = true,
-        bool $putContents = true
-    ): void {
+    public function testChildLogPathErrorFileNotWritable(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('is not writable');
+
+        // Create a temp file and set not writable
+        $logPath = $this->getTestTempFilename(__FUNCTION__, 'log');
+        touch($logPath);
+        chmod($logPath, 0400);
+
+        $this->setupStartFunctions(null);
+
+        try {
+            $this->tester->execute([
+                'action' => 'start',
+                '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
+                '-d' => true,
+                '-o' => $logPath,
+            ]);
+        } finally {
+            unlink($logPath);
+        }
+    }
+
+    public function testChildLogPathErrorDirNotWritable(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot create child log file');
+
+        // Create a temp dir and set not writable
+        $logDir = $this->getTestTempFilename(__FUNCTION__, '');
+        mkdir($logDir);
+        chmod($logDir, 0500);
+        $logPath = $logDir . '/cannot-write-this.log';
+
+        $this->setupStartFunctions(null);
+
+        try {
+            $this->tester->execute([
+                'action' => 'start',
+                '-p' => $this->getTestTempFilename(__FUNCTION__, 'pid'),
+                '-d' => true,
+                '-o' => $logPath,
+            ]);
+        } finally {
+            rmdir($logDir);
+        }
+    }
+
+    public function testStoppingSuccessfully(): void
+    {
+        $expectedPid = rand(1, 99999);
+        $pidFile = $this->getTestTempFilename(__FUNCTION__, 'pid');
+
+        // Set the pidFile to have the expected PID which should be passed to `posix_kill()`
+        file_put_contents($pidFile, $expectedPid);
+
+        $posix_kill = $this->getFunctionMock(__NAMESPACE__, 'posix_kill');
+        $posix_kill->expects(static::exactly(2))
+            ->withConsecutive(
+                [$expectedPid, SIGTERM],
+                [$expectedPid, 0],
+            )
+            ->willReturnOnConsecutiveCalls(
+                true,
+                false,
+            );
+
+        // Remove the delay used to wait for a real process to exit
+        $usleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
+        $usleep->expects(static::any())->willReturn(true);
+
+        $this->tester->execute([
+            'action' => 'stop',
+            '-p' => $pidFile,
+        ]);
+
+        unlink($pidFile);
+    }
+
+    private function setupStartFunctions(?int $fork, int $setsid = 0): void
+    {
         $pcntl_fork = $this->getFunctionMock(__NAMESPACE__, 'pcntl_fork');
         $pcntl_fork->expects(static::any())->willReturn($fork);
 
         $posix_setsid = $this->getFunctionMock(__NAMESPACE__, 'posix_setsid');
         $posix_setsid->expects(static::any())->willReturn($setsid);
 
-        $file_exists = $this->getFunctionMock(__NAMESPACE__, 'file_exists');
-        $file_exists->expects(static::any())->willReturn($fexists);
-
-        $is_writable = $this->getFunctionMock(__NAMESPACE__, 'is_writable');
-        $is_writable->expects(static::any())->willReturn($writeable);
-
-        $is_writable = $this->getFunctionMock(__NAMESPACE__, 'file_put_contents');
-        $is_writable->expects(static::any())->willReturn($putContents);
-
-        $is_writable = $this->getFunctionMock(__NAMESPACE__, 'unlink');
-        $is_writable->expects(static::any())->willReturn(true);
-
         $usleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
         $usleep->expects(static::any())->willReturn(true);
     }
 
-    protected function setupStopFunctions(
-        int $pid,
-        bool $fexists = true,
-        bool $opened = true,
-        bool $withPosixKill = false
-    ): void {
-        $file_exists = $this->getFunctionMock(__NAMESPACE__, 'file_exists');
-        $file_exists->expects(static::any())->willReturn($fexists);
-
-        $fopen = $this->getFunctionMock(__NAMESPACE__, 'fopen');
-        $fopen->expects(static::any())->willReturn($opened);
-
-        $fgets = $this->getFunctionMock(__NAMESPACE__, 'fgets');
-        $fgets->expects(static::any())->willReturn($pid);
-
-        $fclose = $this->getFunctionMock(__NAMESPACE__, 'fclose');
-        $fclose->expects(static::any())->willReturn(true);
-
-        if ($withPosixKill) {
-            $posix_kill = $this->getFunctionMock(__NAMESPACE__, 'posix_kill');
-            $posix_kill->expects(static::any())->willReturn(false);
-        }
-
-        $usleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
-        $usleep->expects(static::any())->willReturn(true);
+    private function getTestTempFilename(string $functionName, string $fileExtension): string
+    {
+        return __DIR__ . "/{$functionName}-" . uniqid() .
+            ($fileExtension ? '.' . $fileExtension : '');
     }
 }
