@@ -93,6 +93,10 @@ class BackgroundCommand extends Command
     {
     }
 
+    /**
+     * @todo v4: Update $e parameter type to \Throwable
+     * @param \Throwable $e
+     */
     protected function onException(\Exception $e, InputInterface $input, OutputInterface $output): void
     {
     }

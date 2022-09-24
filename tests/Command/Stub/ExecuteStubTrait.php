@@ -17,12 +17,18 @@ trait ExecuteStubTrait
 
     private int $exitCode = 0;
 
+    private \Throwable $exception;
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->executeCount++;
 
         if (isset($this->executeValue)) {
             $output->writeln($this->executeValue);
+        }
+
+        if (isset($this->exception)) {
+            throw $this->exception;
         }
 
         if ($this->shutdown) {
@@ -47,6 +53,12 @@ trait ExecuteStubTrait
     public function setExitCode(int $exitCode): self
     {
         $this->exitCode = $exitCode;
+        return $this;
+    }
+
+    public function setException(\Throwable $e): self
+    {
+        $this->exception = $e;
         return $this;
     }
 

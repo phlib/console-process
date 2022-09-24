@@ -107,4 +107,30 @@ class BackgroundCommandTest extends TestCase
         static::assertTrue($this->command->onShutdownCalled);
         static::assertFalse($this->command->onExceptionCalled);
     }
+
+    public function testExceptionShutdown(): void
+    {
+        $expectedException = new \BadMethodCallException(uniqid('test-exception'));
+        $this->command->setException($expectedException);
+
+        // Exit before processing signals
+        $dispatch = $this->getFunctionMock(__NAMESPACE__, 'pcntl_signal_dispatch');
+        $dispatch->expects(static::never());
+
+        // Exit before calling sleep
+        $usleep = $this->getFunctionMock(__NAMESPACE__, 'usleep');
+        $usleep->expects(static::never());
+
+        try {
+            $this->tester->execute([]);
+        } catch (\Throwable $actualException) {
+            static::assertSame($expectedException, $actualException);
+        }
+
+        static::assertSame(1, $this->command->getExecuteCount());
+        static::assertTrue($this->command->onStartCalled);
+        static::assertFalse($this->command->onShutdownCalled);
+        static::assertTrue($this->command->onExceptionCalled);
+        static::assertSame($expectedException, $this->command->onExceptionCalledWith);
+    }
 }
