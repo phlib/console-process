@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="EasyCodingStandard" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="$PROJECT_DIR$/vendor/bin/ecs" scriptParameters="--fix">
+    <CommandLine workingDirectory="$PROJECT_DIR$">
+      <envs>
+        <env name="XDEBUG_MODE" value="off" />
+      </envs>
+    </CommandLine>
+    <method v="2" />
+  </configuration>
+</component>

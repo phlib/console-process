@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Phlib\ConsoleProcess\Command\DaemonCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
 
 class Daemon extends DaemonCommand
 {

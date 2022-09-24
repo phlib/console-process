@@ -2,26 +2,27 @@
 
 declare(strict_types=1);
 
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symplify\EasyCodingStandard\ValueObject\Option;
+use Symplify\EasyCodingStandard\Config\ECSConfig;
 use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
-return static function (ContainerConfigurator $containerConfigurator): void {
-    $parameters = $containerConfigurator->parameters();
-    $parameters->set(Option::PATHS, [
+return static function (ECSConfig $ecsConfig): void {
+    $ecsConfig->paths([
         __DIR__ . '/example',
         __DIR__ . '/src',
         __DIR__ . '/tests',
     ]);
 
-    $services = $containerConfigurator->services();
+    $ecsConfig->sets([
+        SetList::COMMON,
+        SetList::PSR_12,
+    ]);
 
-    $containerConfigurator->import(SetList::COMMON);
-    // Remove sniff, from common/control-structures
-    $services->remove(\PhpCsFixer\Fixer\ClassNotation\OrderedClassElementsFixer::class);
-    // Remove sniff, from common/spaces
-    $services->remove(\PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer::class);
-    $services->remove(\PhpCsFixer\Fixer\CastNotation\CastSpacesFixer::class);
+    $ecsConfig->skip([
+        // Remove sniff, from common/control-structures
+        \PhpCsFixer\Fixer\ClassNotation\OrderedClassElementsFixer::class,
 
-    $containerConfigurator->import(SetList::PSR_12);
+        // Remove sniff, from common/spaces
+        \PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer::class,
+        \PhpCsFixer\Fixer\CastNotation\CastSpacesFixer::class,
+    ]);
 };

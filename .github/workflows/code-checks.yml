@@ -39,6 +39,9 @@ jobs:
       - name: Composer
         run: composer install --no-progress
 
+      - name: Check CS
+        run: vendor/bin/ecs
+
       - name: PHPUnit
         run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
