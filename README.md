@@ -113,8 +113,10 @@ class MyProcessCommand extends BackgroundCommand
 ### Lifecycle Methods
 
 The background command has additional methods that get called when the process
-finishes, which can be used for any final cleanup.
+starts and finishes. Useful for any initialising or final cleanup.
 
+  * `onStart(InputInterface $input, OutputInterface $output): void`
+    * Similar to standard `initialize()`; useful for `DaemonCommand`.
   * `onShutdown(InputInterface $input, OutputInterface $output): void`
   * `onException(\Exception $e, InputInterface $input, OutputInterface $output): void`
 
@@ -206,6 +208,12 @@ class MyProcessCommand extends DaemonCommand
     protected function onAfterDaemonizeParent(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('onAfterDaemonizeParent method called.');
+    }
+    
+    protected function onStart(InputInterface $input, OutputInterface $output): void
+    {
+        // Similar to `onAfterDaemonizeChild()` but also called if `--daemonize` option is not set.
+        $output->writeln('onStart method called.');
     }
 }
 ```
