@@ -51,6 +51,7 @@ class BackgroundCommand extends Command
     {
         $this->registerSignals($output);
         $output->writeln('Background PCNTL Signals registered.', OutputInterface::VERBOSITY_VERBOSE);
+        $this->onStart($input, $output);
 
         $exitCode = 0;
         while ($this->continue) {
@@ -82,6 +83,10 @@ class BackgroundCommand extends Command
     final protected function shutdown(): void
     {
         $this->continue = false;
+    }
+
+    protected function onStart(InputInterface $input, OutputInterface $output): void
+    {
     }
 
     protected function onShutdown(InputInterface $input, OutputInterface $output): void

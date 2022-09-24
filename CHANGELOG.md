@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- New `onStart()` method that can be overridden to include code to only run
+  once, before `execute()`.
 
 ## [3.0.0] - 2021-10-17
 ### Added

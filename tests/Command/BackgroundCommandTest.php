@@ -80,6 +80,9 @@ class BackgroundCommandTest extends TestCase
         $this->tester->execute([]);
 
         static::assertSame(1, $this->command->getExecuteCount());
+        static::assertTrue($this->command->onStartCalled);
+        static::assertTrue($this->command->onShutdownCalled);
+        static::assertFalse($this->command->onExceptionCalled);
     }
 
     public function testExitCodeShutdown(): void
@@ -100,5 +103,8 @@ class BackgroundCommandTest extends TestCase
 
         static::assertSame($exitCode, $actual);
         static::assertSame(1, $this->command->getExecuteCount());
+        static::assertTrue($this->command->onStartCalled);
+        static::assertTrue($this->command->onShutdownCalled);
+        static::assertFalse($this->command->onExceptionCalled);
     }
 }
