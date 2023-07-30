@@ -1,6 +1,6 @@
 # phlib/console-process
 
-[![Code Checks](https://img.shields.io/github/workflow/status/phlib/console-process/CodeChecks?logo=github)](https://github.com/phlib/console-process/actions/workflows/code-checks.yml)
+[![Code Checks](https://img.shields.io/github/actions/workflow/status/phlib/console-process/code-checks.yml?logo=github)](https://github.com/phlib/console-process/actions/workflows/code-checks.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/phlib/console-process.svg?logo=codecov)](https://codecov.io/gh/phlib/console-process)
 [![Latest Stable Version](https://img.shields.io/packagist/v/phlib/console-process.svg?logo=packagist)](https://packagist.org/packages/phlib/console-process)
 [![Total Downloads](https://img.shields.io/packagist/dt/phlib/console-process.svg?logo=packagist)](https://packagist.org/packages/phlib/console-process)
