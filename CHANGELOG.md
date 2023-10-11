@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Allow Symfony v6 dependencies
 ### Removed
 - **BC break**: Removed support for PHP v7 as it is no longer
   [actively supported](https://php.net/supported-versions.php) by the PHP project.
