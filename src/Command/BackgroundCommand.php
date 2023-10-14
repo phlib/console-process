@@ -37,7 +37,7 @@ class BackgroundCommand extends Command
         $this->addSignalCallback(SIGINT, [$this, 'shutdown']);
     }
 
-    public function setCode(callable $code): self
+    public function setCode(callable $code): static
     {
         $this->backgroundExecute = $code;
 
