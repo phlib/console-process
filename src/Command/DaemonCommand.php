@@ -12,8 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
 /**
- * Class DaemonCommand
- * @package Phlib\ConsoleProcess\Console
+ * @package phlib/console-process
  */
 class DaemonCommand extends BackgroundCommand
 {

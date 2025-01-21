@@ -9,8 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class BackgroundCommand
- * @package Phlib\ConsoleProcess\Command
+ * @package phlib/console-process
  */
 class BackgroundCommand extends Command
 {

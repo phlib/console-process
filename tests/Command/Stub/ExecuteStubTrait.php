@@ -7,6 +7,9 @@ namespace Phlib\ConsoleProcess\Command\Stub;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @package phlib/console-process
+ */
 trait ExecuteStubTrait
 {
     private int $executeCount = 0;

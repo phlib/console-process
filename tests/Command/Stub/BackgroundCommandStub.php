@@ -8,6 +8,9 @@ use Phlib\ConsoleProcess\Command\BackgroundCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @package phlib/console-process
+ */
 class BackgroundCommandStub extends BackgroundCommand
 {
     use ExecuteStubTrait;

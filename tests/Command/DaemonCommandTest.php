@@ -10,6 +10,9 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
+/**
+ * @package phlib/console-process
+ */
 class DaemonCommandTest extends TestCase
 {
     use PHPMock;

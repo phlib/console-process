@@ -8,6 +8,9 @@ use Phlib\ConsoleProcess\Command\DaemonCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @package phlib/console-process
+ */
 class DaemonCommandStub extends DaemonCommand
 {
     use ExecuteStubTrait;
