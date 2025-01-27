@@ -11,7 +11,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * @package phlib/console-process
+ * @package Phlib\Console-Process
  */
 class DaemonCommandTest extends TestCase
 {

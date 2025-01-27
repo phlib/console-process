@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @package phlib/console-process
+ * @package Phlib\Console-Process
  */
 trait ExecuteStubTrait
 {
