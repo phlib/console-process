@@ -15,8 +15,8 @@
     ],
     "require": {
         "php": "^8.0",
-        "ext-pcntl" : "*",
-        "ext-posix" : "*",
+        "ext-pcntl": "*",
+        "ext-posix": "*",
         "symfony/console": "^5 || ^6 || ^7"
     },
     "require-dev": {
@@ -30,12 +30,12 @@
         }
     },
     "autoload-dev": {
-       "psr-4": {
-           "Phlib\\ConsoleProcess\\": "tests/"
-       }
+        "psr-4": {
+            "Phlib\\ConsoleProcess\\": "tests/"
+        }
     },
     "scripts": {
-        "cs-check": "vendor/bin/ecs",
-        "cs-fix": "vendor/bin/ecs --fix"
+        "check-cs": "vendor/bin/ecs check --ansi",
+        "fix-cs": "vendor/bin/ecs check --fix --ansi"
     }
 }
