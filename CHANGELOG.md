@@ -6,11 +6,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [5.0.0] - 2025-06-19
-### Changed
-- fix for symfony/console setCode() call
-- fix for PHP 8.4 deprecation warnings
-
 ## [4.0.1] - 2025-01-21
 ### Changed
 - Allow Symfony v7 dependencies
