@@ -48,4 +48,19 @@ return ECSConfig::configure()
         [
             'closure_fn_spacing' => 'none',
         ],
+    )
+
+    /*
+     * Rule from PER Coding Style 2.6:
+     * "If the list is split across multiple lines, then the last item MUST have a trailing comma."
+     */
+    ->withConfiguredRule(
+        \PhpCsFixer\Fixer\ControlStructure\TrailingCommaInMultilineFixer::class,
+        [
+            'elements' => [
+                \PhpCsFixer\Fixer\ControlStructure\TrailingCommaInMultilineFixer::ELEMENTS_ARGUMENTS,
+                \PhpCsFixer\Fixer\ControlStructure\TrailingCommaInMultilineFixer::ELEMENTS_ARRAYS,
+                \PhpCsFixer\Fixer\ControlStructure\TrailingCommaInMultilineFixer::ELEMENTS_PARAMETERS,
+            ],
+        ],
     );

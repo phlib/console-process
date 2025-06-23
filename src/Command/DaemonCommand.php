@@ -59,7 +59,7 @@ class DaemonCommand extends BackgroundCommand
                 return $this->status($input, $output);
             default:
                 throw new \InvalidArgumentException(
-                    "Provided action is invalid, expecting 'start', 'stop' or 'status'."
+                    "Provided action is invalid, expecting 'start', 'stop' or 'status'.",
                 );
         }
     }

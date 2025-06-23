@@ -126,7 +126,7 @@ class BackgroundCommand extends Command
                 pcntl_signal($signal, function () use ($signal, $output, $callback) {
                     $output->writeln(
                         "Received signal '{$signal}', calling registered callback.",
-                        OutputInterface::VERBOSITY_VERBOSE
+                        OutputInterface::VERBOSITY_VERBOSE,
                     );
                     return $callback();
                 });
