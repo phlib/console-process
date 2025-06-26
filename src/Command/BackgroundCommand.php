@@ -27,8 +27,7 @@ class BackgroundCommand extends Command
     public function __construct(?string $name = null)
     {
         parent::__construct($name);
-
-        parent::setCode(fn($input, $output) => $this->background($input, $output));
+        parent::setCode(\Closure::fromCallable([$this, 'background']));
 
         $this->backgroundExecute = [$this, 'execute'];
 
