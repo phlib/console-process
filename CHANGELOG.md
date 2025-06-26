@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- TypeError due to BC break in symfony/console v7.3 `Command::setCode()`.
+  HT @marko-krueger
+- PHP 8.4 deprecation warnings. HT @marko-krueger
 
 ## [4.0.1] - 2025-01-21
 ### Changed

@@ -24,11 +24,11 @@ class BackgroundCommand extends Command
      */
     private $backgroundExecute;
 
-    public function __construct(string $name = null)
+    public function __construct(?string $name = null)
     {
         parent::__construct($name);
 
-        parent::setCode([$this, 'background']);
+        parent::setCode(\Closure::fromCallable([$this, 'background']));
         $this->backgroundExecute = [$this, 'execute'];
 
         // add stop signals
