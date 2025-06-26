@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.0.2] - 2025-06-25
 ### Fixed
 - TypeError due to BC break in symfony/console v7.3 `Command::setCode()`.
   HT @marko-krueger
